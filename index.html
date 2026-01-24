@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI智选二手平台 - 让闲置重获新生 (V17)</title>
+    
+    <!-- SEO Meta标签 (#10) -->
+    <meta name="description" content="AI智选二手平台，AI精准匹配推送，让闲置重获新生。简单发布，智能推荐，零佣金成交。">
+    <meta name="keywords" content="二手交易,闲置转让,AI匹配,二手平台,智选,Wise Select">
+    <meta property="og:title" content="AI智选二手平台 - WISE SELECT">
+    <meta property="og:description" content="AI精准匹配推送，让好物遇见对的人">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&h=630&fit=crop">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <!-- Favicon (#13) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2310b981' rx='20' width='100' height='100'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>AI</text></svg>">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+    <style>
+        * { font-family: 'Noto Sans SC', 'Inter', -apple-system, sans-serif; }
+        
+        @keyframes bounce-in {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-bounce-in { animation: bounce-in 0.4s ease-out; }
+        
+        @keyframes slide-up {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-up { animation: slide-up 0.3s ease-out; }
+        
+        @keyframes slide-in-right {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        .animate-slide-in-right { animation: slide-in-right 0.3s ease-out; }
+        
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in { animation: fade-in 0.2s ease-out; }
+        
+        /* Toast动画 (#15) */
+        @keyframes toast-in {
+            from { transform: translateY(-20px) translateX(-50%); opacity: 0; }
+            to { transform: translateY(0) translateX(-50%); opacity: 1; }
+        }
+        @keyframes toast-out {
+            from { transform: translateY(0) translateX(-50%); opacity: 1; }
+            to { transform: translateY(-20px) translateX(-50%); opacity: 0; }
+        }
+        .toast-enter { animation: toast-in 0.3s ease-out; }
+        .toast-exit { animation: toast-out 0.3s ease-out forwards; }
+        
+        /* 复制成功动效 (#17) */
+        @keyframes checkmark {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .animate-checkmark { animation: checkmark 0.3s ease-out; }
+        
+        .brand-gradient {
+            background: linear-gradient(to right, #059669, #2563eb); 
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.05));
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(to right, #10b981, #3b82f6);
+        }
+
+        .roadmap-item { position: relative; }
+        .roadmap-item::before {
+            content: '';
+            position: absolute;
+            left: 24px;
+            top: 48px;
+            bottom: -24px;
+            width: 2px;
+            background: linear-gradient(to bottom, #10b981, #e5e7eb);
+        }
+        .roadmap-item:last-child::before { display: none; }
+        
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+        .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+        
+        .order-code {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+        
+        /* 骨架屏 (#12) */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        /* 图片懒加载 (#11) */
+        .lazy-image {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .lazy-image.loaded { opacity: 1; }
+        
+        /* 表单验证 (#16) */
+        .input-error {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        
+        /* V13: 彩色分类图标 */
+        .category-icon { transition: color 0.2s; }
+        .cat-all .category-icon { color: #3B82F6; }
+        .cat-furniture .category-icon { color: #F97316; }
+        .cat-digital .category-icon { color: #8B5CF6; }
+        .cat-clothing .category-icon { color: #EC4899; }
+        .cat-baby .category-icon { color: #22C55E; }
+        .cat-home .category-icon { color: #14B8A6; }
+        .cat-books .category-icon { color: #F59E0B; }
+        .cat-sports .category-icon { color: #06B6D4; }
+        .cat-games .category-icon { color: #EF4444; }
+        .cat-tools .category-icon { color: #64748B; }
+        
+        /* 分类选中状态背景色 */
+        .category-btn.active.cat-all { background: #3B82F6 !important; }
+        .category-btn.active.cat-furniture { background: #F97316 !important; }
+        .category-btn.active.cat-digital { background: #8B5CF6 !important; }
+        .category-btn.active.cat-clothing { background: #EC4899 !important; }
+        .category-btn.active.cat-baby { background: #22C55E !important; }
+        .category-btn.active.cat-home { background: #14B8A6 !important; }
+        .category-btn.active.cat-books { background: #F59E0B !important; }
+        .category-btn.active.cat-sports { background: #06B6D4 !important; }
+        .category-btn.active.cat-games { background: #EF4444 !important; }
+        .category-btn.active.cat-tools { background: #64748B !important; }
+        .category-btn.active .category-icon { color: white !important; }
+        
+        /* 分类横向滚动优化 */
+        .category-scroll {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .category-scroll::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Toast容器 (#15) -->
+    <div id="toastContainer" class="fixed top-20 left-1/2 -translate-x-1/2 z-[100] pointer-events-none"></div>
+    
+    <!-- 返回顶部按钮 (#14) -->
+    <button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="fixed bottom-6 right-6 z-50 w-12 h-12 btn-gradient rounded-full shadow-lg flex items-center justify-center text-white opacity-0 invisible transition-all duration-300 hover:shadow-xl hover:scale-110">
+        <i data-lucide="chevron-up" class="w-6 h-6"></i>
+    </button>
+
+    <!-- 导航栏 -->
+    <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-40 transition-all border-b border-gray-100">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <!-- Logo区域 (#1 移动端品牌名) -->
+            <div class="flex items-center gap-2 md:gap-3 cursor-pointer group" onclick="showPage('home')">
+                <div class="w-10 h-10 md:w-12 md:h-12 btn-gradient rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-300">
+                    <i data-lucide="sparkles" class="w-5 h-5 md:w-7 md:h-7 text-white"></i>
+                </div>
+                
+                <div class="flex flex-col justify-center -space-y-0.5">
+                    <div class="flex items-center">
+                        <!-- 移动端显示"AI智选" -->
+                        <span class="text-xl font-black brand-gradient leading-tight tracking-tight md:hidden">AI智选</span>
+                        <!-- PC端显示完整名称 -->
+                        <span class="hidden md:inline text-2xl font-black brand-gradient leading-tight tracking-tight">AI智选二手平台</span>
+                    </div>
+                    <!-- 英文副标题仅PC端显示 V16-2: 全大写+加宽字间距 -->
+                    <span class="hidden md:block text-[10px] text-slate-600 font-bold uppercase tracking-widest scale-95 origin-left">
+                        WISE SELECT
+                    </span>
+                </div>
+            </div>
+            
+            <!-- PC端导航 (#3 高亮当前页) -->
+            <div class="hidden md:flex items-center gap-6 text-sm text-gray-600">
+                <button onclick="showPage('home')" class="nav-link hover:text-blue-600 font-medium transition-colors" data-page="home">浏览市场</button>
+                <button onclick="showPage('post')" class="nav-link hover:text-blue-600 font-medium transition-colors" data-page="post">发布闲置</button>
+                <button onclick="goToPricing()" class="hover:text-blue-600 font-medium transition-colors">收费说明</button>
+                <button onclick="showPage('my-order')" class="nav-link hover:text-blue-600 font-medium transition-colors" data-page="my-order">我的商品</button>
+                <button onclick="showPage('faq')" class="nav-link hover:text-blue-600 font-medium transition-colors" data-page="faq">常见问题</button>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="showPage('post')" class="btn-gradient text-white px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm font-bold hover:shadow-lg hover:shadow-blue-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">发布宝贝</span>
+                    <span class="sm:hidden">发布</span>
+                </button>
+                
+                <!-- 汉堡菜单按钮 (#2) -->
+                <button onclick="toggleMobileMenu()" class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6 text-gray-700" id="menuIcon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 移动端抽屉菜单 (#2) -->
+    <div id="mobileMenuOverlay" class="fixed inset-0 bg-black/50 z-50 hidden" onclick="toggleMobileMenu()"></div>
+    <div id="mobileMenu" class="fixed top-0 right-0 h-full w-72 bg-white z-50 transform translate-x-full transition-transform duration-300 shadow-2xl">
+        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+            <span class="font-bold text-lg brand-gradient">AI智选</span>
+            <button onclick="toggleMobileMenu()" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100">
+                <i data-lucide="x" class="w-6 h-6 text-gray-700"></i>
+            </button>
+        </div>
+        <div class="p-4 space-y-2">
+            <button onclick="showPage('home');toggleMobileMenu()" class="mobile-nav-link w-full text-left px-4 py-3 rounded-xl hover:bg-blue-50 hover:text-blue-600 font-medium transition-all flex items-center gap-3" data-page="home">
+                <i data-lucide="home" class="w-5 h-5"></i> 浏览市场
+            </button>
+            <button onclick="showPage('post');toggleMobileMenu()" class="mobile-nav-link w-full text-left px-4 py-3 rounded-xl hover:bg-blue-50 hover:text-blue-600 font-medium transition-all flex items-center gap-3" data-page="post">
+                <i data-lucide="upload" class="w-5 h-5"></i> 发布闲置
+            </button>
+            <button onclick="goToPricing();toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl hover:bg-blue-50 hover:text-blue-600 font-medium transition-all flex items-center gap-3">
+                <i data-lucide="tag" class="w-5 h-5"></i> 收费说明
+            </button>
+            <button onclick="showPage('my-order');toggleMobileMenu()" class="mobile-nav-link w-full text-left px-4 py-3 rounded-xl hover:bg-blue-50 hover:text-blue-600 font-medium transition-all flex items-center gap-3" data-page="my-order">
+                <i data-lucide="package" class="w-5 h-5"></i> 我的商品
+            </button>
+            <button onclick="showPage('faq');toggleMobileMenu()" class="mobile-nav-link w-full text-left px-4 py-3 rounded-xl hover:bg-blue-50 hover:text-blue-600 font-medium transition-all flex items-center gap-3" data-page="faq">
+                <i data-lucide="help-circle" class="w-5 h-5"></i> 常见问题
+            </button>
+        </div>
+        
+        <!-- 客服入口 (#20) -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-gray-50">
+            <div class="text-center">
+                <p class="text-sm text-gray-500 mb-2">需要帮助？</p>
+                <button onclick="showContactModal()" class="w-full bg-blue-50 text-blue-600 py-2.5 rounded-xl font-medium flex items-center justify-center gap-2">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i>
+                    联系客服
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 首页 -->
+    <div id="page-home">
+        <!-- Hero区域 -->
+        <section class="bg-gradient-to-br from-emerald-50 via-white to-blue-50 py-12 md:py-24 overflow-hidden relative">
+            <div class="absolute top-20 right-10 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 left-10 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl"></div>
+            
+            <div class="max-w-6xl mx-auto px-4 relative">
+                <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+                    <div>
+                        <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-sm mb-6 border border-blue-100 font-medium">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-blue-500"></i>
+                            AI 持续进化中
+                        </div>
+                        <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-6">
+                            让闲置<span class="brand-gradient">重获新生</span>
+                        </h1>
+                        <p class="text-gray-600 text-lg mb-4 leading-relaxed font-medium">
+                            AI精准匹配推送，让好物遇见对的人。
+                        </p>
+                        <p class="text-gray-500 mb-4">
+                            我们正在打造更智能的二手交易体验，您的每一次使用都在帮助AI变得更聪明。
+                        </p>
+                        <!-- V14: 开业福利标语 -->
+                        <p class="text-emerald-600 font-semibold text-sm md:text-base mb-8 flex items-center gap-2">
+                            <span class="animate-pulse">🎉</span>
+                            开业福利：首2个月成交零佣金
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <button onclick="showPage('post')" class="btn-gradient text-white px-8 py-3.5 rounded-full font-bold hover:shadow-xl hover:shadow-blue-500/30 transition-all flex items-center gap-2">
+                                立即发布
+                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="document.getElementById('ai-roadmap').scrollIntoView({ behavior: 'smooth' })" class="bg-white text-gray-700 px-8 py-3.5 rounded-full font-medium border border-gray-200 hover:border-blue-300 hover:text-blue-600 transition-all flex items-center gap-2">
+                                <i data-lucide="rocket" class="w-4 h-4"></i>
+                                查看AI功能
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="relative hidden md:block">
+                        <div class="absolute -top-4 -left-4 w-full h-full bg-gradient-to-br from-emerald-400 to-blue-500 rounded-3xl rotate-3 opacity-20"></div>
+                        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=450&fit=crop" alt="精选二手好物" class="relative rounded-3xl shadow-2xl w-full object-cover transform hover:scale-[1.01] transition-transform duration-500 lazy-image" loading="lazy" onload="this.classList.add('loaded')">
+                        <div class="absolute -bottom-4 -right-4 bg-white rounded-2xl shadow-xl p-4 flex items-center gap-3 animate-bounce-in border border-gray-100">
+                            <div class="w-12 h-12 btn-gradient rounded-xl flex items-center justify-center">
+                                <i data-lucide="brain" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 font-medium">AI精准匹配</p>
+                                <p class="font-bold text-gray-800">让好物遇见对的人</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 运作流程 -->
+        <section id="how-it-works" class="py-16 md:py-20 bg-white">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">运作流程</h2>
+                    <p class="text-gray-500">简单三步，AI助力交易</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6 md:gap-8">
+                    <div class="relative group">
+                        <div class="bg-gray-50 rounded-2xl p-6 md:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                            <div class="w-12 h-12 md:w-14 md:h-14 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <i data-lucide="upload" class="w-6 h-6 md:w-7 md:h-7 text-emerald-600"></i>
+                            </div>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">发布</h3>
+                            <p class="text-gray-500 leading-relaxed mb-3 text-sm md:text-base">拍照上传，AI自动识别分类，智能优化展示</p>
+                            <span class="inline-flex items-center gap-1 text-xs bg-emerald-100 text-emerald-600 px-2 py-1 rounded-full font-medium">
+                                <i data-lucide="check-circle" class="w-3 h-3"></i> 已上线
+                            </span>
+                        </div>
+                        <div class="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
+                            <i data-lucide="chevron-right" class="w-8 h-8 text-gray-300"></i>
+                        </div>
+                    </div>
+                    <div class="relative group">
+                        <div class="bg-gradient-to-br from-emerald-50 to-blue-50 rounded-2xl p-6 md:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-blue-100">
+                            <div class="w-12 h-12 md:w-14 md:h-14 btn-gradient rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <i data-lucide="sparkles" class="w-6 h-6 md:w-7 md:h-7 text-white"></i>
+                            </div>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">AI智能匹配 ✨</h3>
+                            <p class="text-gray-500 leading-relaxed mb-2 text-sm md:text-base">
+                                <strong class="text-blue-600">当前：</strong>智能分类，优先展示
+                            </p>
+                            <p class="text-gray-400 text-xs md:text-sm mb-3">
+                                <strong class="text-amber-500">即将：</strong>基于偏好的精准推送
+                            </p>
+                            <span class="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">
+                                <i data-lucide="zap" class="w-3 h-3"></i> 持续进化
+                            </span>
+                        </div>
+                        <div class="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
+                            <i data-lucide="chevron-right" class="w-8 h-8 text-gray-300"></i>
+                        </div>
+                    </div>
+                    <div class="relative group">
+                        <div class="bg-gray-50 rounded-2xl p-6 md:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                            <div class="w-12 h-12 md:w-14 md:h-14 bg-cyan-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <i data-lucide="message-circle" class="w-6 h-6 md:w-7 md:h-7 text-cyan-600"></i>
+                            </div>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3">直接联系</h3>
+                            <p class="text-gray-500 leading-relaxed mb-3 text-sm md:text-base">买家直接联系您，零佣金成交，记得标记"已成交"</p>
+                            <span class="inline-flex items-center gap-1 text-xs bg-emerald-100 text-emerald-600 px-2 py-1 rounded-full font-medium">
+                                <i data-lucide="check-circle" class="w-3 h-3"></i> 已上线
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 商品浏览 -->
+        <section class="py-12 md:py-16 bg-gray-50">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-bold text-gray-900">浏览好物</h2>
+                        <p class="text-sm text-gray-500 mt-1">发现附近的优质闲置</p>
+                    </div>
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                        <input type="text" placeholder="搜索宝贝..." id="searchInput" oninput="filterProducts()" class="pl-10 pr-4 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:border-blue-400 w-full sm:w-48 bg-white transition-all focus:w-full sm:focus:w-64 focus:shadow-md">
+                    </div>
+                </div>
+                
+                <div class="flex gap-2 md:gap-3 mb-8 overflow-x-auto pb-2 category-scroll" id="categoryTabs">
+                    <button onclick="selectCategory('all')" class="category-btn cat-all active flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/30 whitespace-nowrap" data-category="all">
+                        <i data-lucide="tag" class="w-5 h-5 category-icon"></i>全部
+                    </button>
+                    <button onclick="selectCategory('家具')" class="category-btn cat-furniture flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white text-gray-600 hover:bg-gray-100 whitespace-nowrap" data-category="家具">
+                        <i data-lucide="sofa" class="w-5 h-5 category-icon"></i>家具
+                    </button>
+                    <button onclick="selectCategory('数码')" class="category-btn cat-digital flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white text-gray-600 hover:bg-gray-100 whitespace-nowrap" data-category="数码">
+                        <i data-lucide="smartphone" class="w-5 h-5 category-icon"></i>数码
+                    </button>
+                    <button onclick="selectCategory('服饰')" class="category-btn cat-clothing flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white text-gray-600 hover:bg-gray-100 whitespace-nowrap" data-category="服饰">
+                        <i data-lucide="shirt" class="w-5 h-5 category-icon"></i>服饰
+                    </button>
+                    <button onclick="selectCategory('母婴')" class="category-btn cat-baby flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white text-gray-600 hover:bg-gray-100 whitespace-nowrap" data-category="母婴">
+                        <i data-lucide="baby" class="w-5 h-5 category-icon"></i>母婴
+                    </button>
+                    <button onclick="selectCategory('家居')" class="category-btn cat-home flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white text-gray-600 hover:bg-gray-100 whitespace-nowrap" data-category="家居">
+                        <i data-lucide="lamp" class="w-5 h-5 category-icon"></i>家居
+                    </button>
+                    <button onclick="selectCategory('书籍')" class="category-btn cat-books flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white text-gray-600 hover:bg-gray-100 whitespace-nowrap" data-category="书籍">
+                        <i data-lucide="book-open" class="w-5 h-5 category-icon"></i>书籍
+                    </button>
+                    <button onclick="selectCategory('运动')" class="category-btn cat-sports flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white text-gray-600 hover:bg-gray-100 whitespace-nowrap" data-category="运动">
+                        <i data-lucide="bike" class="w-5 h-5 category-icon"></i>运动
+                    </button>
+                    <button onclick="selectCategory('游戏')" class="category-btn cat-games flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white text-gray-600 hover:bg-gray-100 whitespace-nowrap" data-category="游戏">
+                        <i data-lucide="gamepad-2" class="w-5 h-5 category-icon"></i>游戏
+                    </button>
+                    <button onclick="selectCategory('工具')" class="category-btn cat-tools flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white text-gray-600 hover:bg-gray-100 whitespace-nowrap" data-category="工具">
+                        <i data-lucide="wrench" class="w-5 h-5 category-icon"></i>工具
+                    </button>
+                </div>
+                
+                <!-- 骨架屏 (#12) -->
+                <div id="productSkeleton" class="hidden grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+                    <div class="bg-white rounded-2xl overflow-hidden border border-gray-100">
+                        <div class="aspect-[4/3] skeleton"></div>
+                        <div class="p-4 space-y-3">
+                            <div class="h-4 skeleton rounded w-3/4"></div>
+                            <div class="h-3 skeleton rounded w-1/2"></div>
+                            <div class="h-10 skeleton rounded-xl"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl overflow-hidden border border-gray-100">
+                        <div class="aspect-[4/3] skeleton"></div>
+                        <div class="p-4 space-y-3">
+                            <div class="h-4 skeleton rounded w-3/4"></div>
+                            <div class="h-3 skeleton rounded w-1/2"></div>
+                            <div class="h-10 skeleton rounded-xl"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 hidden md:block">
+                        <div class="aspect-[4/3] skeleton"></div>
+                        <div class="p-4 space-y-3">
+                            <div class="h-4 skeleton rounded w-3/4"></div>
+                            <div class="h-3 skeleton rounded w-1/2"></div>
+                            <div class="h-10 skeleton rounded-xl"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 hidden lg:block">
+                        <div class="aspect-[4/3] skeleton"></div>
+                        <div class="p-4 space-y-3">
+                            <div class="h-4 skeleton rounded w-3/4"></div>
+                            <div class="h-3 skeleton rounded w-1/2"></div>
+                            <div class="h-10 skeleton rounded-xl"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 商品网格 -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5" id="productGrid"></div>
+                
+                <!-- 空状态 (#7) -->
+                <div id="emptyState" class="hidden py-16 text-center">
+                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="search-x" class="w-10 h-10 text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-700 mb-2">暂无相关商品</h3>
+                    <p class="text-gray-500 text-sm mb-6">试试其他关键词，或切换分类看看</p>
+                    <button onclick="resetSearch()" class="text-blue-600 font-medium hover:text-blue-700 flex items-center justify-center gap-2 mx-auto">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                        重置搜索
+                    </button>
+                </div>
+                
+                <!-- V16: 醒目的求购入口 -->
+                <div class="mt-10">
+                    <button onclick="showWantedModal()" class="w-full max-w-lg mx-auto block btn-gradient rounded-2xl p-5 md:p-6 text-white shadow-lg hover:shadow-xl hover:shadow-blue-500/30 transform hover:-translate-y-1 transition-all duration-300 group">
+                        <div class="flex items-center justify-center gap-4">
+                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="search" class="w-6 h-6"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-lg font-bold">没有找到想要的？</p>
+                                <p class="text-blue-100 text-sm flex items-center gap-1">
+                                    <span class="bg-white/20 px-2 py-0.5 rounded-full text-xs font-bold">免费</span>
+                                    发布求购，有货第一时间通知您
+                                    <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                                </p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 收费说明 -->
+        <section id="pricing" class="py-16 md:py-20 bg-white">
+            <div class="max-w-5xl mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">透明定价</h2>
+                    <p class="text-gray-500">仅收极低发布费，<strong class="text-blue-600">无成交佣金</strong>，简单透明</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-4 md:gap-6">
+                    <div class="bg-gray-50 rounded-2xl p-5 md:p-6 border-2 border-transparent hover:border-blue-300 transition-all group hover:bg-white hover:shadow-lg">
+                        <div class="text-sm text-blue-600 font-bold mb-2">¥500 以内</div>
+                        <div class="flex items-baseline gap-1 mb-4">
+                            <span class="text-3xl md:text-4xl font-black text-gray-900">¥2.9</span>
+                            <span class="text-gray-500">/件</span>
+                        </div>
+                        <ul class="space-y-2 md:space-y-3 text-gray-600 text-sm">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> AI精准匹配推送</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> 30天展示期</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> 无成交佣金</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> 可延期续展</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-5 md:p-6 shadow-xl border-2 border-blue-400 transition-all relative transform hover:-translate-y-1">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">热门</div>
+                        <div class="text-sm text-blue-600 font-bold mb-2">¥500 - ¥3000</div>
+                        <div class="flex items-baseline gap-1 mb-4">
+                            <span class="text-3xl md:text-4xl font-black text-gray-900">¥3.9</span>
+                            <span class="text-gray-500">/件</span>
+                        </div>
+                        <ul class="space-y-2 md:space-y-3 text-gray-600 text-sm">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> AI精准匹配推送</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> 45天展示期</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> 无成交佣金</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> 可延期续展</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="btn-gradient rounded-2xl p-5 md:p-6 shadow-lg text-white relative overflow-hidden transform hover:-translate-y-1 transition-all">
+                        <div class="absolute top-0 right-0 bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-bl-xl">推荐</div>
+                        <div class="text-blue-50 font-bold mb-2">¥3000 以上</div>
+                        <div class="flex items-baseline gap-1 mb-4">
+                            <span class="text-3xl md:text-4xl font-black">¥5.9</span>
+                            <span class="text-blue-50">/件</span>
+                        </div>
+                        <ul class="space-y-2 md:space-y-3 text-blue-50 text-sm">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> AI精准匹配推送</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> 60天展示期</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> 无成交佣金</li>
+                            <li class="flex items-center gap-2"><i data-lucide="star" class="w-4 h-4"></i> 首页优先展示</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-gray-50 rounded-xl p-4 text-center">
+                    <p class="text-sm text-gray-500">
+                        <i data-lucide="info" class="w-4 h-4 inline mr-1 text-blue-500"></i>
+                        商品到期前可申请延期：≤500元 ¥1.9/15天，500-3000元 ¥2.9/20天，>3000元 ¥3.9/30天
+                    </p>
+                </div>
+                
+                <!-- V14: 零佣金承诺板块 -->
+                <div class="mt-8 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl p-5 md:p-6 border border-emerald-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="badge-check" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">智选承诺：零佣金窗口期</h3>
+                            <p class="text-sm text-gray-500">平台上线首2个月</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-4 text-sm mb-4">
+                        <div class="flex items-start gap-2">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5"></i>
+                            <div>
+                                <span class="font-bold text-gray-800">零佣金</span>
+                                <p class="text-gray-500">成交金额100%归你</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5"></i>
+                            <div>
+                                <span class="font-bold text-gray-800">透明定价</span>
+                                <p class="text-gray-500">仅收发布费，无隐藏费用</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5"></i>
+                            <div>
+                                <span class="font-bold text-gray-800">节日福利</span>
+                                <p class="text-gray-500">不定期抽奖送好礼</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
+                        <i data-lucide="clock" class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"></i>
+                        <div class="text-sm">
+                            <span class="font-bold text-amber-800">限时政策：</span>
+                            <span class="text-amber-700">2个月后启用AI智能定价，承诺始终优于行业水平。趁零佣金窗口期，抓紧发布！</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI功能路线图 -->
+        <section id="ai-roadmap" class="py-16 md:py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+            <div class="max-w-4xl mx-auto px-4">
+                <div class="text-center mb-12">
+                    <div class="inline-flex items-center gap-2 bg-blue-500/20 text-blue-300 px-4 py-1.5 rounded-full text-sm mb-4 border border-blue-500/30">
+                        <i data-lucide="rocket" class="w-4 h-4"></i>
+                        功能路线图
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-4">AI 功能持续进化中</h2>
+                    <p class="text-gray-400">我们正在一步步实现更智能的匹配体验</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="roadmap-item">
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center">
+                                <i data-lucide="check" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="flex-1 bg-white/10 rounded-xl p-4 md:p-5">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="text-xs bg-emerald-500 text-white px-2 py-0.5 rounded-full font-medium">✅ 已上线</span>
+                                    <h4 class="font-bold text-base md:text-lg">智能分类</h4>
+                                </div>
+                                <p class="text-gray-300 text-sm">AI自动识别商品类型，归入最佳分类，方便买家精准搜索</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="roadmap-item">
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center">
+                                <i data-lucide="check" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="flex-1 bg-white/10 rounded-xl p-4 md:p-5">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="text-xs bg-emerald-500 text-white px-2 py-0.5 rounded-full font-medium">✅ 已上线</span>
+                                    <h4 class="font-bold text-base md:text-lg">智能展示排序</h4>
+                                </div>
+                                <p class="text-gray-300 text-sm">新发布商品获得优先展示，高价商品享受首页推荐位</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="roadmap-item">
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center pulse-dot">
+                                <i data-lucide="zap" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="flex-1 bg-white/10 rounded-xl p-4 md:p-5 border border-amber-500/30">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full font-medium">🔥 灰度测试中</span>
+                                    <h4 class="font-bold text-base md:text-lg">浏览偏好与私域推送</h4>
+                                </div>
+                                <p class="text-gray-300 text-sm mb-3">分析买家浏览习惯和停留时间，学习用户偏好特征。</p>
+                                <div class="bg-amber-500/10 rounded-lg p-3 border border-amber-500/20">
+                                    <p class="text-amber-300 text-xs font-bold mb-2">⚡️ 特别测试服务：</p>
+                                    <ul class="text-xs text-amber-100 space-y-1.5">
+                                        <li class="flex items-start gap-1.5">
+                                            <i data-lucide="target" class="w-3.5 h-3.5 mt-0.5 text-amber-400"></i>
+                                            目前对部分商品做AI精准推送销售
+                                        </li>
+                                        <li class="flex items-start gap-1.5">
+                                            <i data-lucide="users" class="w-3.5 h-3.5 mt-0.5 text-amber-400"></i>
+                                            VIP私域流量池分发
+                                        </li>
+                                    </ul>
+                                </div>
+                                <p class="text-amber-400 text-xs mt-3">测试期：2026年1月 - 2月</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="roadmap-item">
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gray-600 rounded-xl flex items-center justify-center">
+                                <i data-lucide="bell" class="w-6 h-6 text-gray-300"></i>
+                            </div>
+                            <div class="flex-1 bg-white/5 rounded-xl p-4 md:p-5 border border-gray-600">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="text-xs bg-gray-600 text-gray-200 px-2 py-0.5 rounded-full font-medium">🚀 即将推出</span>
+                                    <h4 class="font-bold text-base md:text-lg text-gray-300">精准推送通知</h4>
+                                </div>
+                                <p class="text-gray-400 text-sm">当有匹配您商品的买家时，主动推送消息提醒</p>
+                                <p class="text-gray-500 text-xs mt-2">预计上线：2026年3月</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="roadmap-item">
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gray-600 rounded-xl flex items-center justify-center">
+                                <i data-lucide="calculator" class="w-6 h-6 text-gray-300"></i>
+                            </div>
+                            <div class="flex-1 bg-white/5 rounded-xl p-4 md:p-5 border border-gray-600">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="text-xs bg-gray-600 text-gray-200 px-2 py-0.5 rounded-full font-medium">🚀 规划中</span>
+                                    <h4 class="font-bold text-base md:text-lg text-gray-300">智能定价建议</h4>
+                                </div>
+                                <p class="text-gray-400 text-sm">AI分析市场行情和成交数据，给出最优定价建议</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl p-6 text-center border border-blue-500/30">
+                    <div class="flex items-center justify-center gap-2 mb-3">
+                        <i data-lucide="heart" class="w-5 h-5 text-emerald-400"></i>
+                        <span class="font-bold text-lg">与我们一起成长</span>
+                    </div>
+                    <p class="text-gray-300 text-sm mb-4">
+                        您的每一次发布、每一次浏览，都在帮助AI学习和进化。<br>
+                        感谢您成为AI智选的早期用户！
+                    </p>
+                    <button onclick="showPage('post')" class="btn-gradient text-white px-6 py-2.5 rounded-full font-medium hover:shadow-lg transition-all">
+                        立即发布，助力AI成长
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA区域 -->
+        <section class="py-16 md:py-20 btn-gradient relative overflow-hidden">
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+            <div class="max-w-4xl mx-auto px-4 text-center relative">
+                <h2 class="text-2xl md:text-4xl font-bold text-white mb-4">成为AI的训练师</h2>
+                <p class="text-blue-100 text-base md:text-lg mb-8">您的每一次使用，都在帮助AI智选变得更智能</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="showPage('post')" class="bg-white text-blue-600 px-8 py-3.5 rounded-full font-bold hover:shadow-xl transition-all flex items-center gap-2">
+                        立即发布
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="showPage('my-order')" class="bg-transparent text-white px-8 py-3.5 rounded-full font-medium border-2 border-white/50 hover:bg-white/10 transition-all">
+                        查询我的商品
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="bg-gray-900 text-gray-400 py-12">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                    <div class="col-span-2 md:col-span-1">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 btn-gradient rounded-xl flex items-center justify-center">
+                                <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-lg font-bold text-white tracking-wide">AI智选</span>
+                                <span class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">WISE SELECT</span>
+                            </div>
+                        </div>
+                        <p class="text-sm">AI精准匹配推送的二手交易平台<br>让好物遇见对的人</p>
+                        
+                        <!-- 客服入口 (#20) -->
+                        <button onclick="showContactModal()" class="mt-4 text-sm text-blue-400 hover:text-blue-300 flex items-center gap-2">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                            联系客服
+                        </button>
+                    </div>
+                    <div>
+                        <h5 class="text-white font-medium mb-4">市场</h5>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#" onclick="showPage('home')" class="hover:text-blue-400">浏览全部</a></li>
+                            <li><a href="#" class="hover:text-blue-400">热门宝贝</a></li>
+                            <li><a href="#" class="hover:text-blue-400">最新发布</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 class="text-white font-medium mb-4">帮助</h5>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#" onclick="showPage('faq')" class="hover:text-blue-400">常见问题</a></li>
+                            <li><a href="#" onclick="document.getElementById('ai-roadmap').scrollIntoView({ behavior: 'smooth' })" class="hover:text-blue-400">AI功能介绍</a></li>
+                            <li><a href="#" onclick="showPage('my-order')" class="hover:text-blue-400">查询我的商品</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 class="text-white font-medium mb-4">法律</h5>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#" class="hover:text-blue-400">服务条款</a></li>
+                            <li><a href="#" class="hover:text-blue-400">隐私政策</a></li>
+                            <li><a href="#" class="hover:text-blue-400">免责声明</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-gray-800 pt-8 text-center text-sm">
+                    <p>© 2026 AI智选二手平台 · WISE SELECT - All Rights Reserved</p>
+                    <p class="mt-2 text-xs text-gray-500">
+                        本平台提供信息展示和AI精准匹配推送服务，最终成交取决于商品本身和市场需求。AI功能持续优化中，感谢您的支持与反馈。
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 发布页面 -->
+    <div id="page-post" class="hidden min-h-screen bg-gray-50 py-6 md:py-8">
+        <div class="max-w-2xl mx-auto px-4">
+            <div class="mb-6 md:mb-8">
+                <span class="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-bold">快速发布</span>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mt-4 mb-2">发布您的闲置宝贝</h1>
+                <p class="text-gray-500 text-sm md:text-base">无需注册，AI精准匹配推送，获得专属订单码管理商品</p>
+            </div>
+            
+            <!-- V14: 零佣金提示条 -->
+            <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-3 mb-4 flex items-center justify-center gap-2 text-white shadow-lg">
+                <i data-lucide="gift" class="w-5 h-5"></i>
+                <span class="text-sm font-medium">限时福利：首2个月成交零佣金，卖出多少都是你的！</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl p-5 md:p-6 shadow-sm mb-4 md:mb-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
+                    <h2 class="text-lg font-bold text-gray-800">上传图片</h2>
+                    <span class="text-xs text-gray-400 ml-auto">最多3张</span>
+                </div>
+                <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 md:p-8 text-center border-2 border-dashed border-amber-200 relative overflow-hidden" id="uploadArea">
+                    <input type="file" accept="image/*" multiple onchange="handleImageUpload(event)" class="absolute inset-0 opacity-0 cursor-pointer" id="imageInput">
+                    <div id="uploadPlaceholder">
+                        <i data-lucide="camera" class="w-10 h-10 md:w-12 md:h-12 text-amber-400 mx-auto mb-3"></i>
+                        <p class="text-amber-700 font-medium">拖拽图片或点击上传</p>
+                        <p class="text-amber-500 text-sm mt-1">支持 jpg/png，自动压缩优化</p>
+                    </div>
+                    <div id="imagePreview" class="hidden flex flex-wrap justify-center gap-3 md:gap-4"></div>
+                </div>
+                <div id="compressProgress" class="hidden mt-3">
+                    <div class="flex items-center gap-2 text-sm text-blue-600">
+                        <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span id="compressText">正在优化图片...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 md:p-6 shadow-sm mb-4 md:mb-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
+                    <h2 class="text-lg font-bold text-gray-800">宝贝详情</h2>
+                    <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full ml-auto">AI自动分类</span>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm text-gray-600 mb-1 block">物品名称 <span class="text-red-500">*</span></label>
+                        <input type="text" id="itemName" placeholder="例如：北欧风橡木边几" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-400 focus:bg-white transition-all">
+                        <p id="itemNameError" class="error-message hidden">请输入物品名称</p>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600 mb-1 block">价格 <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">¥</span>
+                            <input type="number" id="itemPrice" placeholder="0.00" oninput="updatePriceInfo()" class="w-full pl-8 pr-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-400 focus:bg-white transition-all">
+                        </div>
+                        <p id="priceHint" class="text-xs text-blue-600 mt-1 hidden"></p>
+                        <p id="itemPriceError" class="error-message hidden">请输入价格</p>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600 mb-1 block">分类 <span class="text-red-500">*</span></label>
+                        <select id="itemCategory" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-400 focus:bg-white transition-all">
+                            <option value="">请选择分类</option>
+                            <option value="家具">🛋️ 家具</option>
+                            <option value="数码">📱 数码</option>
+                            <option value="服饰">👕 服饰</option>
+                            <option value="母婴">👶 母婴</option>
+                            <option value="家居">🏠 家居</option>
+                            <option value="书籍">📚 书籍</option>
+                            <option value="运动">🚲 运动</option>
+                            <option value="游戏">🎮 游戏</option>
+                            <option value="工具">🔧 工具</option>
+                        </select>
+                        <p id="itemCategoryError" class="error-message hidden">请选择分类</p>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600 mb-1 block">描述</label>
+                        <textarea id="itemDesc" placeholder="请介绍物品的新旧程度、尺寸等..." rows="3" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-400 focus:bg-white transition-all resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 rounded-2xl p-5 md:p-6 mb-4 md:mb-6 border border-blue-100">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
+                    <h2 class="text-lg font-bold text-gray-800">联系方式</h2>
+                </div>
+                <p class="text-sm text-gray-500 mb-4">买家将直接联系您，平台不收取任何交易佣金</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-blue-700 mb-1 block flex items-center gap-1">
+                            <i data-lucide="phone" class="w-4 h-4"></i> 电话号码
+                        </label>
+                        <input type="tel" id="phone" placeholder="请输入电话号码" class="w-full px-4 py-3 bg-white rounded-xl border border-blue-200 focus:outline-none focus:border-blue-400 transition-all">
+                    </div>
+                    <div>
+                        <label class="text-sm text-blue-700 mb-1 block flex items-center gap-1">
+                            <i data-lucide="message-square" class="w-4 h-4"></i> 微信号
+                        </label>
+                        <input type="text" id="wechat" placeholder="请输入微信号" class="w-full px-4 py-3 bg-white rounded-xl border border-blue-200 focus:outline-none focus:border-blue-400 transition-all">
+                    </div>
+                </div>
+                <p id="contactError" class="error-message hidden mt-2">请至少填写一种联系方式</p>
+                <div class="mt-4 bg-blue-100/50 rounded-lg p-3 text-xs text-blue-700 flex items-start gap-2">
+                    <i data-lucide="shield" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>
+                    <span>隐私说明：您的联系信息仅对有意向的买家可见。</span>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-emerald-500 to-blue-500 rounded-2xl p-5 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-white text-center sm:text-left">
+                    <p class="text-sm text-blue-100">发布费用</p>
+                    <p class="text-3xl font-bold" id="publishFee">¥0.00</p>
+                    <p class="text-xs text-blue-200 mt-1" id="displayDays"></p>
+                </div>
+                <button onclick="handleSubmit()" class="w-full sm:w-auto bg-white text-blue-600 px-8 py-3.5 rounded-full font-bold hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                    支付并发布
+                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-500">
+                    发布成功后将获得<strong class="text-blue-600">专属订单码</strong>，可用于查询状态、标记成交、申请延期
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 我的商品页面 -->
+    <div id="page-my-order" class="hidden min-h-screen bg-gray-50 py-6 md:py-8">
+        <div class="max-w-2xl mx-auto px-4">
+            <div class="mb-6 md:mb-8">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">我的商品</h1>
+                <p class="text-gray-500 text-sm md:text-base">输入订单码查询商品状态，可标记成交或申请延期</p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 md:p-6 shadow-sm mb-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <i data-lucide="search" class="w-6 h-6 text-blue-500"></i>
+                    <h2 class="text-lg font-bold text-gray-800">查询订单</h2>
+                </div>
+                <div class="flex gap-3">
+                    <input type="text" id="orderCodeInput" placeholder="输入订单码，如：ZX20250119ABCD" class="flex-1 px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-400 focus:bg-white transition-all order-code text-base md:text-lg">
+                    <button onclick="queryOrder()" class="bg-blue-500 text-white px-5 md:px-6 py-3 rounded-xl font-medium hover:bg-blue-600 transition-all">
+                        查询
+                    </button>
+                </div>
+                <p class="text-xs text-gray-400 mt-3">
+                    <i data-lucide="info" class="w-3 h-3 inline mr-1"></i>
+                    订单码在发布成功后会显示，请妥善保存
+                </p>
+            </div>
+
+            <div id="orderResult" class="hidden">
+                <div class="bg-white rounded-2xl p-5 md:p-6 shadow-sm mb-6">
+                    <div class="flex gap-4">
+                        <img id="resultImage" src="" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl bg-gray-100">
+                        <div class="flex-1 min-w-0">
+                            <h3 id="resultName" class="font-bold text-gray-800 text-base md:text-lg truncate"></h3>
+                            <p id="resultPrice" class="text-blue-600 font-bold text-lg md:text-xl mt-1"></p>
+                            <p id="resultCategory" class="text-sm text-gray-400 mt-1"></p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div><p class="text-gray-400">订单码</p><p id="resultCode" class="font-mono font-bold text-gray-800"></p></div>
+                            <div><p class="text-gray-400">状态</p><p id="resultStatus" class="font-bold"></p></div>
+                            <div><p class="text-gray-400">发布日期</p><p id="resultDate" class="text-gray-800"></p></div>
+                            <div><p class="text-gray-400">剩余展示</p><p id="resultDaysLeft" class="font-bold"></p></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="orderActions" class="grid md:grid-cols-2 gap-4">
+                    <button onclick="markAsSold()" id="btnMarkSold" class="bg-emerald-500 text-white p-4 rounded-xl font-medium hover:bg-emerald-600 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="check-circle" class="w-5 h-5"></i> 标记为已成交
+                    </button>
+                    <button onclick="showExtendModal()" id="btnExtend" class="bg-white text-blue-600 p-4 rounded-xl font-medium border-2 border-blue-200 hover:border-blue-400 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="clock" class="w-5 h-5"></i> 申请延期
+                    </button>
+                </div>
+                <div id="soldNotice" class="hidden bg-gray-100 rounded-xl p-6 text-center">
+                    <i data-lucide="check-circle" class="w-12 h-12 text-emerald-500 mx-auto mb-3"></i>
+                    <p class="font-bold text-gray-800">此商品已标记为成交</p>
+                    <p class="text-sm text-gray-500 mt-1">感谢使用AI智选！</p>
+                </div>
+            </div>
+            <div id="orderNotFound" class="hidden bg-amber-50 rounded-xl p-6 text-center">
+                <i data-lucide="search-x" class="w-12 h-12 text-amber-400 mx-auto mb-3"></i>
+                <p class="font-bold text-gray-800">未找到此订单</p>
+                <p class="text-sm text-gray-500 mt-1">请检查订单码是否正确</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ页面 (#19) -->
+    <div id="page-faq" class="hidden min-h-screen bg-gray-50 py-6 md:py-8">
+        <div class="max-w-3xl mx-auto px-4">
+            <div class="mb-6 md:mb-8 text-center">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">常见问题</h1>
+                <p class="text-gray-500">有疑问？这里可能有您要的答案</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl p-5 shadow-sm">
+                    <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="help-circle" class="w-5 h-5 text-blue-500"></i>
+                        如何发布商品？
+                    </h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">点击"发布宝贝"按钮，上传商品图片（最多3张），填写名称、价格、分类和联系方式，支付少量发布费即可上架。无需注册账号。</p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-5 shadow-sm">
+                    <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="help-circle" class="w-5 h-5 text-blue-500"></i>
+                        收费标准是怎样的？
+                    </h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">我们按商品价格分三档收费：≤500元收¥2.9（30天）、500-3000元收¥3.9（45天）、>3000元收¥5.9（60天）。仅收发布费，<strong>首2个月无成交佣金</strong>。</p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-5 shadow-sm">
+                    <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="help-circle" class="w-5 h-5 text-blue-500"></i>
+                        什么是订单码？如何使用？
+                    </h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">订单码是您发布成功后获得的唯一编码（如ZX20250119ABCD），用于查询商品状态、标记成交、申请延期。请妥善保存！</p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-5 shadow-sm">
+                    <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="help-circle" class="w-5 h-5 text-blue-500"></i>
+                        商品到期了怎么办？
+                    </h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">商品到期前可申请延期续展。延期价格比首次便宜：≤500元商品延期¥1.9/15天，500-3000元¥2.9/20天，>3000元¥3.9/30天。</p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-5 shadow-sm">
+                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <i data-lucide="help-circle" class="w-5 h-5 text-blue-500"></i>
+                        AI精准匹配推送是什么？
+                    </h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-3">我们的AI会智能分析商品特征，精准匹配潜在买家，并通过多渠道主动推送：</p>
+                    <ul class="text-gray-600 text-sm space-y-2 ml-1">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>
+                            <span><strong>站内优先展示</strong>：在相关类目中获得更多曝光</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>
+                            <span><strong>平台外推送</strong>：前期测试阶段，免费推送至相关二手交易社群</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>
+                            <span><strong>私域触达</strong>：根据买家偏好，精准推送给有需求的用户</span>
+                        </li>
+                    </ul>
+                    <p class="text-gray-500 text-sm mt-3">我们正在持续优化算法，让匹配更精准，帮您更快找到买家！</p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-5 shadow-sm">
+                    <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="help-circle" class="w-5 h-5 text-blue-500"></i>
+                        交易如何进行？平台参与吗？
+                    </h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">平台仅提供信息展示服务，不参与实际交易。买家会通过您留下的联系方式直接联系您，双方自行协商价格和交易方式。建议选择同城面交，当面验货更安全。</p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-5 shadow-sm">
+                    <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="help-circle" class="w-5 h-5 text-blue-500"></i>
+                        发布费可以退款吗？
+                    </h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">发布费用于平台运营和AI服务，原则上不支持退款。但如果遇到特殊情况，我们可以提供免费延期作为补偿，请联系客服。</p>
+                </div>
+            </div>
+            
+            <div class="mt-8 bg-blue-50 rounded-xl p-6 text-center">
+                <p class="text-gray-700 mb-4">没有找到答案？</p>
+                <button onclick="showContactModal()" class="btn-gradient text-white px-6 py-2.5 rounded-full font-medium">
+                    联系客服
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商品详情弹窗 (#4 #5) -->
+    <div id="productDetailModal" class="hidden fixed inset-0 bg-black/60 flex items-end md:items-center justify-center z-50">
+        <div class="bg-white w-full md:max-w-lg md:rounded-2xl rounded-t-3xl max-h-[90vh] overflow-hidden animate-slide-up md:animate-bounce-in">
+            <div class="relative">
+                <!-- 图片轮播 (#5) -->
+                <div class="relative aspect-square bg-gray-100 overflow-hidden">
+                    <div id="detailImageContainer" class="flex transition-transform duration-300">
+                        <!-- 图片由JS动态生成 -->
+                    </div>
+                    <!-- 轮播指示器 -->
+                    <div id="imageIndicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2"></div>
+                    <!-- 左右箭头 -->
+                    <button onclick="prevImage()" id="prevImageBtn" class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
+                        <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                    </button>
+                    <button onclick="nextImage()" id="nextImageBtn" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
+                        <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <button onclick="closeProductDetail()" class="absolute top-4 right-4 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-all">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="p-5 max-h-[50vh] overflow-y-auto">
+                <div class="flex items-start justify-between gap-4 mb-4">
+                    <h3 id="detailName" class="text-xl font-bold text-gray-800"></h3>
+                    <span id="detailPrice" class="text-2xl font-bold text-blue-600 whitespace-nowrap"></span>
+                </div>
+                <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                    <span id="detailCategory" class="bg-gray-100 px-2 py-1 rounded"></span>
+                    <span id="detailLocation" class="flex items-center gap-1">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                        <span></span>
+                    </span>
+                    <span id="detailViews" class="flex items-center gap-1">
+                        <i data-lucide="eye" class="w-4 h-4"></i>
+                        <span></span>
+                    </span>
+                </div>
+                <p id="detailDesc" class="text-gray-600 text-sm leading-relaxed mb-6"></p>
+                <div class="bg-blue-50 rounded-xl p-4 mb-4">
+                    <p class="text-sm text-gray-600 mb-3">联系卖家</p>
+                    <div class="flex gap-3">
+                        <a id="detailPhone" href="" class="flex-1 bg-emerald-500 text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-emerald-600 transition-all">
+                            <i data-lucide="phone" class="w-4 h-4"></i>
+                            <span></span>
+                        </a>
+                        <button id="detailWechat" onclick="copyWechat()" class="flex-1 bg-green-500 text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-green-600 transition-all">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                            <span></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-400 text-center">提示：请优先选择同城面交，当面验货更安全</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 联系客服弹窗 (#20) -->
+    <div id="contactModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center animate-bounce-in">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="message-circle" class="w-8 h-8 text-blue-500"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">联系客服</h3>
+            <p class="text-gray-500 text-sm mb-6">扫描下方二维码添加客服微信</p>
+            
+            <!-- 客服二维码占位 -->
+            <div class="w-48 h-48 mx-auto bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center mb-4">
+                <div class="text-center text-gray-400">
+                    <i data-lucide="qr-code" class="w-12 h-12 mx-auto mb-2"></i>
+                    <p class="text-sm">客服微信二维码</p>
+                    <p class="text-xs mt-1">请替换为真实二维码</p>
+                </div>
+            </div>
+            
+            <p class="text-sm text-gray-600 mb-4">
+                或添加微信：<strong class="text-blue-600">zhixuan_service</strong>
+            </p>
+            
+            <button onclick="closeContactModal()" class="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-200 transition-all">
+                关闭
+            </button>
+        </div>
+    </div>
+
+    <!-- 成功弹窗 -->
+    <div id="successModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-6 md:p-8 text-center animate-bounce-in max-w-md w-full">
+            <div class="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="check" class="w-8 h-8 text-white"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">提交成功！</h3>
+            <p class="text-gray-500 mt-2 text-sm md:text-base">AI正在分析您的商品，我们将在1-24小时内审核上架</p>
+            <div class="mt-6 bg-blue-50 rounded-xl p-4">
+                <p class="text-sm text-blue-600 mb-2">您的专属订单码</p>
+                <p id="generatedOrderCode" class="order-code text-xl md:text-2xl font-bold text-blue-700 bg-white rounded-lg py-3 px-4"></p>
+                <button onclick="copyOrderCode()" id="copyBtn" class="mt-3 text-sm text-blue-600 hover:text-blue-700 flex items-center justify-center gap-1 mx-auto transition-all">
+                    <i data-lucide="copy" class="w-4 h-4" id="copyIcon"></i>
+                    <span id="copyText">点击复制</span>
+                </button>
+            </div>
+            <div class="mt-4 bg-amber-50 rounded-lg p-3 text-xs text-amber-700">
+                <i data-lucide="alert-circle" class="w-4 h-4 inline mr-1"></i>
+                请保存此订单码，用于查询状态、标记成交、申请延期
+            </div>
+            <button onclick="closeSuccessModal()" class="mt-6 w-full bg-blue-500 text-white py-3 rounded-full font-medium hover:bg-blue-600 transition-all">
+                我已保存，关闭
+            </button>
+        </div>
+    </div>
+
+    <!-- 支付弹窗 -->
+    <div id="paymentModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-5 md:p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">扫码支付</h3>
+                    <button onclick="closePaymentModal()" class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <div class="text-center mb-6">
+                    <p class="text-gray-500 mb-2" id="paymentType">发布费用</p>
+                    <p class="text-4xl font-bold text-blue-600" id="paymentAmount">¥0.00</p>
+                    <p class="text-sm text-gray-400 mt-1" id="paymentDays"></p>
+                    <!-- 支付倒计时 (#9) -->
+                    <p class="text-xs text-amber-600 mt-2" id="paymentCountdown"></p>
+                </div>
+                <div class="flex gap-2 mb-4">
+                    <button onclick="switchPayment('wechat')" id="btn-wechat" class="flex-1 py-2.5 rounded-lg border-2 border-green-500 bg-green-50 text-green-600 font-medium flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18z"/></svg>
+                        微信
+                    </button>
+                    <button onclick="switchPayment('alipay')" id="btn-alipay" class="flex-1 py-2.5 rounded-lg border-2 border-gray-200 text-gray-500 font-medium flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.422 15.358c-3.83-1.153-6.055-1.84-7.373-2.267.642-1.476 1.07-3.122 1.07-4.908 0-.907-.151-1.606-.302-2.078h2.107V4.473h-3.638V2.907h-2.573v1.566H7.076v1.632h2.107c-.151.472-.302 1.17-.302 2.078 0 1.786.453 3.432 1.07 4.908-1.318.428-3.543 1.114-7.373 2.267C.972 16.058 0 17.154 0 18.401v2.693h24v-2.693c0-1.247-.972-2.343-2.578-3.043z"/></svg>
+                        支付宝
+                    </button>
+                </div>
+                
+                <!-- 收款码 (#8 优化占位提示) -->
+                <div class="bg-gray-50 rounded-xl p-4 md:p-6 text-center mb-4">
+                    <div id="qrcode-wechat" class="qrcode-container">
+                        <div class="w-44 h-44 md:w-48 md:h-48 mx-auto bg-white rounded-xl border-2 border-dashed border-green-300 flex items-center justify-center">
+                            <div class="text-center text-gray-400 p-4">
+                                <i data-lucide="qr-code" class="w-10 h-10 mx-auto mb-2 text-green-400"></i>
+                                <p class="text-sm font-medium text-green-600">微信收款码</p>
+                                <p class="text-xs mt-1 text-gray-400">尺寸：300x300px</p>
+                                <p class="text-xs text-gray-400">格式：PNG/JPG</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="qrcode-alipay" class="qrcode-container hidden">
+                        <div class="w-44 h-44 md:w-48 md:h-48 mx-auto bg-white rounded-xl border-2 border-dashed border-blue-300 flex items-center justify-center">
+                            <div class="text-center text-gray-400 p-4">
+                                <i data-lucide="qr-code" class="w-10 h-10 mx-auto mb-2 text-blue-400"></i>
+                                <p class="text-sm font-medium text-blue-600">支付宝收款码</p>
+                                <p class="text-xs mt-1 text-gray-400">尺寸：300x300px</p>
+                                <p class="text-xs text-gray-400">格式：PNG/JPG</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-500 text-sm mt-4">请使用<span id="paymentMethodName" class="font-medium">微信</span>扫码支付</p>
+                </div>
+                
+                <div class="bg-amber-50 rounded-xl p-4 mb-6">
+                    <p class="text-amber-800 text-sm font-medium mb-2">⚠️ 转账时请备注</p>
+                    <div class="bg-white rounded-lg p-3 text-center">
+                        <p class="font-mono text-base md:text-lg font-bold text-gray-800" id="paymentNote"></p>
+                    </div>
+                    <p class="text-amber-600 text-xs mt-2">例如：北欧餐桌1234（方便核对）</p>
+                </div>
+                <button onclick="confirmPayment()" class="w-full btn-gradient text-white py-4 rounded-xl font-bold hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    我已完成支付
+                </button>
+                <p class="text-center text-gray-400 text-xs mt-4">支付后点击上方按钮，AI将开始分析您的商品</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 延期支付弹窗 -->
+    <div id="extendModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full">
+            <div class="p-5 md:p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">申请延期</h3>
+                    <button onclick="closeExtendModal()" class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <div class="text-center mb-6">
+                    <p class="text-gray-500 mb-2">延期费用</p>
+                    <p class="text-4xl font-bold text-blue-600" id="extendAmount">¥1.9</p>
+                    <p class="text-sm text-gray-400 mt-1" id="extendDays">延长15天展示期</p>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-6 text-center mb-4">
+                    <div class="w-36 h-36 md:w-40 md:h-40 mx-auto bg-white rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                        <div class="text-center text-gray-400">
+                            <i data-lucide="qr-code" class="w-8 h-8 mx-auto mb-2"></i>
+                            <p class="text-sm">收款码</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-amber-50 rounded-xl p-3 mb-4 text-center">
+                    <p class="text-amber-700 text-sm">备注：<strong id="extendNote"></strong></p>
+                </div>
+                <button onclick="confirmExtend()" class="w-full bg-blue-500 text-white py-4 rounded-xl font-bold hover:bg-blue-600 transition-all">
+                    我已完成支付
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 标记成交确认弹窗 -->
+    <div id="soldConfirmModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center animate-bounce-in">
+            <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="alert-triangle" class="w-8 h-8 text-amber-500"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">确认标记为已成交？</h3>
+            <p class="text-gray-500 text-sm mb-6">标记后商品将下架，此操作不可撤销</p>
+            <div class="flex gap-3">
+                <button onclick="closeSoldConfirmModal()" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50">取消</button>
+                <button onclick="confirmMarkSold()" class="flex-1 py-3 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-600">确认成交</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- V16: 求购弹窗 -->
+    <div id="wantedModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto animate-bounce-in">
+            <div class="p-5 md:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="search" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">发布求购</h3>
+                            <p class="text-xs text-gray-500">告诉我们您想要什么</p>
+                        </div>
+                    </div>
+                    <button onclick="closeWantedModal()" class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                
+                <!-- 免费提示 -->
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-4 flex items-center gap-2">
+                    <i data-lucide="gift" class="w-5 h-5 text-emerald-600 flex-shrink-0"></i>
+                    <span class="text-sm text-emerald-700"><strong>免费发布</strong>，有匹配商品会第一时间通知您！</span>
+                </div>
+                
+                <!-- 求购表单 -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            想要什么商品？ <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="wantedItem" placeholder="如：iPhone 13 Pro 256G、九成新" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-400 focus:bg-white transition-all">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            商品分类 <span class="text-red-500">*</span>
+                        </label>
+                        <select id="wantedCategory" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-400 focus:bg-white transition-all">
+                            <option value="">请选择分类</option>
+                            <option value="家具">🛋️ 家具</option>
+                            <option value="数码">📱 数码</option>
+                            <option value="服饰">👕 服饰</option>
+                            <option value="母婴">👶 母婴</option>
+                            <option value="家居">🏠 家居</option>
+                            <option value="书籍">📚 书籍</option>
+                            <option value="运动">🚲 运动</option>
+                            <option value="游戏">🎮 游戏</option>
+                            <option value="工具">🔧 工具</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            预算范围 <span class="text-red-500">*</span>
+                        </label>
+                        <select id="wantedBudget" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-400 focus:bg-white transition-all">
+                            <option value="">请选择预算</option>
+                            <option value="0-500">¥500 以内</option>
+                            <option value="500-1000">¥500 - ¥1000</option>
+                            <option value="1000-3000">¥1000 - ¥3000</option>
+                            <option value="3000-5000">¥3000 - ¥5000</option>
+                            <option value="5000+">¥5000 以上</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            微信号 <span class="text-red-500">*</span>
+                            <span class="text-gray-400 font-normal">（用于通知您）</span>
+                        </label>
+                        <input type="text" id="wantedWechat" placeholder="请输入您的微信号" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-400 focus:bg-white transition-all">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            补充说明
+                            <span class="text-gray-400 font-normal">（选填）</span>
+                        </label>
+                        <textarea id="wantedNote" rows="2" placeholder="如：要国行、成色9新以上、最好同城" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-400 focus:bg-white transition-all resize-none"></textarea>
+                    </div>
+                </div>
+                
+                <button onclick="submitWanted()" class="w-full btn-gradient text-white py-4 rounded-xl font-bold mt-6 hover:shadow-lg hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                    提交求购
+                </button>
+                
+                <p class="text-center text-gray-400 text-xs mt-3">
+                    提交后，我们会在有匹配商品时通过微信通知您
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // V13: 商品数据 - 优化结构（适配Supabase数据库）
+        const products = [
+            { id: 'p001', order_code: 'ZX20260115ABCD', name: '北欧风实木餐桌', price: 680, original_price: 1299, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&h=600&fit=crop'], location: '北京·朝阳', category: '家具', status: 'active', is_hot: true, views: 328, description: '9成新北欧风实木餐桌，原价1299购入，使用半年，无划痕无磕碰。尺寸：120x80cm，适合2-4人使用。搬家急出，价格可小刀。', phone: '13800138001', wechat: 'seller_001', publish_fee: 2.9, created_at: '2026-01-15T10:30:00Z', expires_at: '2026-02-14T10:30:00Z' },
+            { id: 'p002', order_code: 'ZX20260116EFGH', name: '索尼WH-1000XM4耳机', price: 1299, original_price: 2499, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600&fit=crop'], location: '上海·浦东', category: '数码', status: 'active', is_hot: false, views: 512, description: '索尼旗舰降噪耳机，国行正品带发票，购于京东自营。配件齐全，包装完好。降噪效果一流，音质出色。', phone: '13900139002', wechat: 'sony_fan', publish_fee: 3.9, created_at: '2026-01-16T14:20:00Z', expires_at: '2026-03-02T14:20:00Z' },
+            { id: 'p003', order_code: 'ZX20260114IJKL', name: '复古真皮手表', price: 459, original_price: 899, image: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=800&h=600&fit=crop'], location: '深圳·南山', category: '服饰', status: 'active', is_hot: false, views: 186, description: '复古风格真皮表带手表，日本机芯，走时精准。表盘直径40mm，适合商务休闲佩戴。', phone: '', wechat: 'watch_lover', publish_fee: 2.9, created_at: '2026-01-14T09:15:00Z', expires_at: '2026-02-13T09:15:00Z' },
+            { id: 'p004', order_code: 'ZX20260112MNOP', name: '多肉植物盆栽组合', price: 89, original_price: 168, image: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800&h=600&fit=crop'], location: '杭州·西湖', category: '家居', status: 'active', is_hot: false, views: 95, description: '精选多肉植物6盆组合，含陶瓷花盆。品种包括：熊童子、桃蛋、玉露等。养护简单，适合新手。', phone: '13700137004', wechat: '', publish_fee: 2.9, created_at: '2026-01-12T16:45:00Z', expires_at: '2026-02-11T16:45:00Z' },
+            { id: 'p005', order_code: 'ZX20260120QRST', name: 'iPad Pro 11寸 2022', price: 4500, original_price: 6799, image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&h=600&fit=crop'], location: '广州·天河', category: '数码', status: 'active', is_hot: true, views: 756, description: 'iPad Pro 11寸 2022款，256G WiFi版，深空灰色。屏幕完美无划痕，电池健康度98%。送官方智能键盘和Apple Pencil 2代。', phone: '13600136005', wechat: 'apple_user', publish_fee: 5.9, created_at: '2026-01-20T08:00:00Z', expires_at: '2026-03-21T08:00:00Z' },
+            { id: 'p006', order_code: 'ZX20260110UVWX', name: '婴儿推车 高景观', price: 899, original_price: 2299, image: 'https://images.unsplash.com/photo-1591088398332-8a7791972843?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1591088398332-8a7791972843?w=800&h=600&fit=crop'], location: '成都·锦江', category: '母婴', status: 'active', is_hot: false, views: 234, description: '德国品牌高景观婴儿推车，可坐可躺，双向推行。适合0-3岁宝宝，承重25kg。配件齐全，送雨罩和蚊帐。', phone: '13500135006', wechat: 'baby_mom', publish_fee: 3.9, created_at: '2026-01-10T11:30:00Z', expires_at: '2026-02-24T11:30:00Z' },
+            { id: 'p007', order_code: 'ZX20260114YZAB', name: '戴森V12吸尘器', price: 2800, original_price: 4990, image: 'https://images.unsplash.com/photo-1558317374-067fb5f30001?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1558317374-067fb5f30001?w=800&h=600&fit=crop'], location: '北京·海淀', category: '家居', status: 'active', is_hot: true, views: 445, description: '戴森V12无线吸尘器，购于官网，使用3个月。吸力强劲，续航持久。配件齐全包括地板吸头、床褥吸头等。', phone: '13400134007', wechat: '', publish_fee: 3.9, created_at: '2026-01-14T13:20:00Z', expires_at: '2026-02-28T13:20:00Z' },
+            { id: 'p008', order_code: 'ZX20260113CDEF', name: '优衣库羽绒服 男款L', price: 299, original_price: 799, image: 'https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=800&h=600&fit=crop'], location: '上海·徐汇', category: '服饰', status: 'active', is_hot: false, views: 167, description: '优衣库高级轻型羽绒服，黑色男款L码。90%白鸭绒填充，轻便保暖。只穿过两次，几乎全新。', phone: '', wechat: 'fashion_guy', publish_fee: 2.9, created_at: '2026-01-13T15:45:00Z', expires_at: '2026-02-12T15:45:00Z' },
+            { id: 'p009', order_code: 'ZX20260115GHIJ', name: '乐高城市系列 警察局', price: 458, original_price: 699, image: 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800&h=600&fit=crop'], location: '深圳·福田', category: '母婴', status: 'active', is_hot: false, views: 89, description: '乐高城市系列60316警察局，全新未拆封。适合6岁以上儿童，含668颗粒，4个人仔。送乐高收纳盒。', phone: '13300133009', wechat: 'lego_dad', publish_fee: 2.9, created_at: '2026-01-15T17:00:00Z', expires_at: '2026-02-14T17:00:00Z' },
+            { id: 'p010', order_code: 'ZX20260120KLMN', name: 'MacBook Air M2', price: 7200, original_price: 9499, image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&h=600&fit=crop'], location: '杭州·滨江', category: '数码', status: 'active', is_hot: true, views: 892, description: 'MacBook Air M2 2022款，8+256G，午夜色。购于Apple Store，AppleCare+还剩1年半。电池循环次数仅38次。', phone: '13200132010', wechat: 'mac_seller', publish_fee: 5.9, created_at: '2026-01-20T09:30:00Z', expires_at: '2026-03-21T09:30:00Z' },
+            // V13新增：书籍分类
+            { id: 'p011', order_code: 'ZX20260118OPQR', name: '《三体》全集 精装典藏版', price: 128, original_price: 238, image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800&h=600&fit=crop'], location: '北京·海淀', category: '书籍', status: 'active', is_hot: true, views: 234, description: '刘慈欣《三体》全集精装典藏版，全新塑封未拆。包含《三体》《黑暗森林》《死神永生》三册，硬壳精装，收藏送礼佳品。', phone: '', wechat: 'book_lover', publish_fee: 2.9, created_at: '2026-01-18T10:00:00Z', expires_at: '2026-02-17T10:00:00Z' },
+            { id: 'p012', order_code: 'ZX20260116STUV', name: '考研英语真题全套', price: 45, original_price: 89, image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&h=600&fit=crop'], location: '武汉·武昌', category: '书籍', status: 'active', is_hot: false, views: 156, description: '考研英语一真题2015-2025，含详细解析和翻译。已上岸，低价转让，书本干净无笔记。', phone: '13100131012', wechat: '', publish_fee: 2.9, created_at: '2026-01-16T14:30:00Z', expires_at: '2026-02-15T14:30:00Z' },
+            // V13新增：运动分类
+            { id: 'p013', order_code: 'ZX20260117WXYZ', name: '捷安特TCR公路自行车', price: 3200, original_price: 5999, image: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&h=600&fit=crop'], location: '上海·闵行', category: '运动', status: 'active', is_hot: true, views: 378, description: '捷安特TCR公路车，碳纤维车架，禧玛诺105套件。骑行约2000公里，保养良好，无摔车记录。送码表和骑行服。', phone: '13000130013', wechat: 'cyclist_sh', publish_fee: 5.9, created_at: '2026-01-17T11:15:00Z', expires_at: '2026-03-18T11:15:00Z' },
+            { id: 'p014', order_code: 'ZX20260119ABCD', name: '迪卡侬瑜伽垫+泡沫轴套装', price: 89, original_price: 169, image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop'], location: '广州·番禺', category: '运动', status: 'active', is_hot: false, views: 67, description: '迪卡侬瑜伽垫183x61cm加厚款，配泡沫轴。使用3次，因健身房关门转让，送瑜伽砖和拉力带。', phone: '12900129014', wechat: 'yoga_girl', publish_fee: 2.9, created_at: '2026-01-19T16:00:00Z', expires_at: '2026-02-18T16:00:00Z' },
+            // V13新增：游戏分类
+            { id: 'p015', order_code: 'ZX20260118EFGH', name: 'PS5光驱版+双手柄', price: 3200, original_price: 4599, image: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&h=600&fit=crop'], location: '广州·天河', category: '游戏', status: 'active', is_hot: true, views: 567, description: 'PS5光驱版国行，带两个原装DualSense手柄。购于京东，发票保修齐全。送《战神5》《地平线2》实体盘。', phone: '12800128015', wechat: '', publish_fee: 5.9, created_at: '2026-01-18T13:45:00Z', expires_at: '2026-03-19T13:45:00Z' },
+            { id: 'p016', order_code: 'ZX20260115IJKL', name: 'Switch OLED + 健身环套装', price: 2100, original_price: 3298, image: 'https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=800&h=600&fit=crop'], location: '杭州·西湖', category: '游戏', status: 'active', is_hot: false, views: 234, description: 'Nintendo Switch OLED白色款，配健身环大冒险。屏幕贴膜，主机完美无划痕。送原装底座和收纳包。', phone: '12700127016', wechat: 'switch_player', publish_fee: 3.9, created_at: '2026-01-15T19:20:00Z', expires_at: '2026-03-01T19:20:00Z' },
+            // V13新增：工具分类
+            { id: 'p017', order_code: 'ZX20260114MNOP', name: '博世电钻工具套装', price: 480, original_price: 899, image: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&h=600&fit=crop'], location: '武汉·武昌', category: '工具', status: 'active', is_hot: false, views: 123, description: '博世GSB 180-LI电钻套装，含电钻主机、两块电池、充电器、钻头螺丝刀头套装。DIY装修完毕，使用次数少。', phone: '12600126017', wechat: 'diy_master', publish_fee: 2.9, created_at: '2026-01-14T10:30:00Z', expires_at: '2026-02-13T10:30:00Z' },
+            { id: 'p018', order_code: 'ZX20260119QRST', name: '史丹利五金工具箱', price: 320, original_price: 599, image: 'https://images.unsplash.com/photo-1581147036324-c47a03a81d48?w=400&h=300&fit=crop', images: ['https://images.unsplash.com/photo-1581147036324-c47a03a81d48?w=800&h=600&fit=crop'], location: '深圳·宝安', category: '工具', status: 'active', is_hot: false, views: 89, description: '史丹利专业五金工具箱118件套，含各种扳手、螺丝刀、钳子、卷尺等。搬家不带走，便宜出。', phone: '', wechat: 'tools_fan', publish_fee: 2.9, created_at: '2026-01-19T14:00:00Z', expires_at: '2026-02-18T14:00:00Z' },
+        ];
+
+        let orders = JSON.parse(localStorage.getItem('zhixuan_orders') || '[]');
+        let selectedCategory = 'all';
+        let uploadedImages = [];
+        let currentOrderCode = '';
+        let currentProductImages = [];
+        let currentImageIndex = 0;
+        let paymentTimer = null;
+        let currentPage = 'home';
+
+        const compressionOptions = { maxSizeMB: 0.3, maxWidthOrHeight: 1200, useWebWorker: true, fileType: 'image/jpeg' };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            renderProducts();
+            initScrollEffects();
+        });
+
+        // 滚动效果 (#14 返回顶部)
+        function initScrollEffects() {
+            const backToTop = document.getElementById('backToTop');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 500) {
+                    backToTop.classList.remove('opacity-0', 'invisible');
+                    backToTop.classList.add('opacity-100', 'visible');
+                } else {
+                    backToTop.classList.add('opacity-0', 'invisible');
+                    backToTop.classList.remove('opacity-100', 'visible');
+                }
+            });
+        }
+
+        // Toast提示 (#15)
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info';
+            
+            toast.className = `${bgColor} text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-2 toast-enter pointer-events-auto mb-2`;
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                toast.classList.remove('toast-enter');
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        // 移动端菜单 (#2)
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const isOpen = !menu.classList.contains('translate-x-full');
+            
+            if (isOpen) {
+                menu.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            } else {
+                menu.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+            lucide.createIcons();
+        }
+
+        // 页面切换 (#3 高亮当前页)
+        function showPage(page) {
+            currentPage = page;
+            ['home', 'post', 'my-order', 'faq'].forEach(p => {
+                const el = document.getElementById('page-' + p);
+                if (el) el.classList.toggle('hidden', p !== page);
+            });
+            
+            // 更新导航高亮
+            document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(link => {
+                const linkPage = link.dataset.page;
+                if (linkPage === page) {
+                    link.classList.add('text-blue-600');
+                } else {
+                    link.classList.remove('text-blue-600');
+                }
+            });
+            
+            window.scrollTo(0, 0);
+            lucide.createIcons();
+            
+            if (page === 'my-order') {
+                document.getElementById('orderResult').classList.add('hidden');
+                document.getElementById('orderNotFound').classList.add('hidden');
+            }
+        }
+
+        function goToPricing() {
+            showPage('home');
+            setTimeout(() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' }), 100);
+        }
+
+        function generateOrderCode() {
+            const date = new Date();
+            const dateStr = date.getFullYear().toString() + (date.getMonth() + 1).toString().padStart(2, '0') + date.getDate().toString().padStart(2, '0');
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+            let random = '';
+            for (let i = 0; i < 4; i++) random += chars.charAt(Math.floor(Math.random() * chars.length));
+            return 'ZX' + dateStr + random;
+        }
+
+        // 分类选择 (V13: 彩色图标支持)
+        const categoryClassMap = {
+            'all': 'cat-all', '家具': 'cat-furniture', '数码': 'cat-digital', '服饰': 'cat-clothing',
+            '母婴': 'cat-baby', '家居': 'cat-home', '书籍': 'cat-books', '运动': 'cat-sports',
+            '游戏': 'cat-games', '工具': 'cat-tools'
+        };
+        
+        function selectCategory(category) {
+            selectedCategory = category;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                const isActive = btn.dataset.category === category;
+                const catClass = categoryClassMap[btn.dataset.category] || '';
+                if (isActive) {
+                    btn.className = `category-btn ${catClass} active flex items-center gap-2 px-3 md:px-4 py-2 rounded-full text-sm font-medium transition-all text-white shadow-lg whitespace-nowrap`;
+                } else {
+                    btn.className = `category-btn ${catClass} flex items-center gap-2 px-3 md:px-4 py-2 rounded-full text-sm font-medium transition-all bg-white text-gray-600 hover:bg-gray-100 whitespace-nowrap`;
+                }
+            });
+            renderProducts();
+        }
+
+        function filterProducts() { renderProducts(); }
+        
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            selectedCategory = 'all';
+            selectCategory('all');
+        }
+
+        // 渲染商品 (#7 空状态) - V13: 适配优化数据结构
+        function renderProducts() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = products.filter(p => {
+                const matchCategory = selectedCategory === 'all' || p.category === selectedCategory;
+                const matchSearch = p.name.toLowerCase().includes(searchQuery) || p.description.toLowerCase().includes(searchQuery);
+                return matchCategory && matchSearch;
+            });
+
+            const grid = document.getElementById('productGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                grid.innerHTML = filtered.map(product => `
+                    <div class="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl hover:border-blue-200 transition-all duration-300 cursor-pointer" onclick="showProductDetail('${product.id}')">
+                        <div class="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 lazy-image" loading="lazy" onload="this.classList.add('loaded')">
+                            ${product.is_hot ? '<span class="absolute top-2 left-2 bg-amber-400 text-amber-900 text-xs font-bold px-2 py-1 rounded-full">热门</span>' : ''}
+                            <div class="absolute bottom-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-sm font-bold text-blue-600">
+                                ¥${product.price.toLocaleString()}
+                            </div>
+                        </div>
+                        <div class="p-3 md:p-4">
+                            <h3 class="font-medium text-gray-800 truncate mb-1 text-sm md:text-base">${product.name}</h3>
+                            <div class="flex items-center justify-between text-xs text-gray-400">
+                                <span class="flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 bg-blue-400 rounded-full"></span>
+                                    ${product.location}
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <i data-lucide="eye" class="w-3 h-3"></i>
+                                    ${product.views}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            lucide.createIcons();
+        }
+
+        // 商品详情弹窗 (#4) - V13: 适配优化数据结构
+        function showProductDetail(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            currentProductImages = product.images || [product.image];
+            currentImageIndex = 0;
+            
+            // 渲染图片
+            const container = document.getElementById('detailImageContainer');
+            container.style.transform = 'translateX(0)';
+            container.innerHTML = currentProductImages.map(img => `
+                <img src="${img}" class="w-full aspect-square object-cover flex-shrink-0" loading="lazy">
+            `).join('');
+            
+            // 渲染指示器
+            const indicators = document.getElementById('imageIndicators');
+            indicators.innerHTML = currentProductImages.map((_, i) => `
+                <button onclick="goToImage(${i})" class="w-2 h-2 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/50'} transition-all"></button>
+            `).join('');
+            
+            // 显示/隐藏箭头
+            document.getElementById('prevImageBtn').classList.toggle('hidden', currentProductImages.length <= 1);
+            document.getElementById('nextImageBtn').classList.toggle('hidden', currentProductImages.length <= 1);
+            
+            // 填充详情
+            document.getElementById('detailName').textContent = product.name;
+            document.getElementById('detailPrice').textContent = '¥' + product.price.toLocaleString();
+            document.getElementById('detailCategory').textContent = product.category;
+            document.querySelector('#detailLocation span').textContent = product.location;
+            document.querySelector('#detailViews span').textContent = product.views + '次浏览';
+            document.getElementById('detailDesc').textContent = product.description;
+            
+            // 联系方式
+            const phoneBtn = document.getElementById('detailPhone');
+            const wechatBtn = document.getElementById('detailWechat');
+            if (product.phone) {
+                phoneBtn.href = 'tel:' + product.phone;
+                phoneBtn.querySelector('span').textContent = product.phone;
+                phoneBtn.classList.remove('hidden');
+            } else {
+                phoneBtn.classList.add('hidden');
+            }
+            if (product.wechat) {
+                wechatBtn.dataset.wechat = product.wechat;
+                wechatBtn.querySelector('span').textContent = product.wechat;
+                wechatBtn.classList.remove('hidden');
+            } else {
+                wechatBtn.classList.add('hidden');
+            }
+            
+            document.getElementById('productDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+        }
+
+        function closeProductDetail() {
+            document.getElementById('productDetailModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // 图片轮播 (#5)
+        function goToImage(index) {
+            currentImageIndex = index;
+            const container = document.getElementById('detailImageContainer');
+            container.style.transform = `translateX(-${index * 100}%)`;
+            updateIndicators();
+        }
+
+        function prevImage() {
+            if (currentImageIndex > 0) goToImage(currentImageIndex - 1);
+        }
+
+        function nextImage() {
+            if (currentImageIndex < currentProductImages.length - 1) goToImage(currentImageIndex + 1);
+        }
+
+        function updateIndicators() {
+            const indicators = document.getElementById('imageIndicators').children;
+            Array.from(indicators).forEach((ind, i) => {
+                ind.className = `w-2 h-2 rounded-full ${i === currentImageIndex ? 'bg-white' : 'bg-white/50'} transition-all`;
+            });
+        }
+
+        function copyWechat() {
+            const wechat = document.getElementById('detailWechat').dataset.wechat;
+            navigator.clipboard.writeText(wechat).then(() => showToast('微信号已复制'));
+        }
+
+        // 联系客服 (#20)
+        function showContactModal() {
+            document.getElementById('contactModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.add('hidden');
+        }
+
+        // V16: 求购弹窗功能
+        function showWantedModal() {
+            document.getElementById('wantedModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+        }
+
+        function closeWantedModal() {
+            document.getElementById('wantedModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function submitWanted() {
+            const item = document.getElementById('wantedItem').value.trim();
+            const category = document.getElementById('wantedCategory').value;
+            const budget = document.getElementById('wantedBudget').value;
+            const wechat = document.getElementById('wantedWechat').value.trim();
+            const note = document.getElementById('wantedNote').value.trim();
+
+            // 验证必填字段
+            if (!item) { showToast('请填写想要的商品', 'error'); return; }
+            if (!category) { showToast('请选择商品分类', 'error'); return; }
+            if (!budget) { showToast('请选择预算范围', 'error'); return; }
+            if (!wechat) { showToast('请填写微信号', 'error'); return; }
+
+            // 模拟提交（实际开发时对接后端API）
+            const wantedData = {
+                item: item,
+                category: category,
+                budget: budget,
+                wechat: wechat,
+                note: note,
+                created_at: new Date().toISOString()
+            };
+            console.log('求购数据:', wantedData);
+
+            // 显示成功提示
+            closeWantedModal();
+            showToast('求购发布成功！有匹配商品会通知您', 'success');
+
+            // 清空表单
+            document.getElementById('wantedItem').value = '';
+            document.getElementById('wantedCategory').value = '';
+            document.getElementById('wantedBudget').value = '';
+            document.getElementById('wantedWechat').value = '';
+            document.getElementById('wantedNote').value = '';
+        }
+
+        // 图片上传
+        async function handleImageUpload(event) {
+            const files = Array.from(event.target.files);
+            if (uploadedImages.length + files.length > 3) { showToast('最多只能上传3张图片', 'error'); return; }
+            document.getElementById('compressProgress').classList.remove('hidden');
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                document.getElementById('compressText').textContent = `正在优化第 ${i + 1}/${files.length} 张图片...`;
+                try {
+                    let compressedFile = file;
+                    if (file.size > 300 * 1024) compressedFile = await imageCompression(file, compressionOptions);
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        uploadedImages.push({ data: e.target.result, size: compressedFile.size });
+                        updateImagePreview();
+                    };
+                    reader.readAsDataURL(compressedFile);
+                } catch (error) { console.error('压缩失败:', error); }
+            }
+            document.getElementById('compressProgress').classList.add('hidden');
+        }
+
+        function updateImagePreview() {
+            const placeholder = document.getElementById('uploadPlaceholder');
+            const preview = document.getElementById('imagePreview');
+            if (uploadedImages.length > 0) {
+                placeholder.classList.add('hidden');
+                preview.classList.remove('hidden');
+                preview.innerHTML = uploadedImages.map((img, i) => `
+                    <div class="relative group">
+                        <img src="${img.data}" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl">
+                        <button onclick="removeImage(${i})" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                        <span class="absolute bottom-1 right-1 bg-black/50 text-white text-xs px-1 rounded">${(img.size/1024).toFixed(0)}KB</span>
+                    </div>
+                `).join('') + (uploadedImages.length < 3 ? `
+                    <label class="w-20 h-20 md:w-24 md:h-24 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-colors">
+                        <input type="file" accept="image/*" onchange="handleImageUpload(event)" class="hidden">
+                        <i data-lucide="plus" class="w-6 h-6 text-gray-400"></i>
+                        <span class="text-xs text-gray-400 mt-1">添加</span>
+                    </label>
+                ` : '');
+                lucide.createIcons();
+            } else { placeholder.classList.remove('hidden'); preview.classList.add('hidden'); }
+        }
+
+        function removeImage(index) { uploadedImages.splice(index, 1); updateImagePreview(); }
+
+        function getPriceInfo(price) {
+            if (price <= 500) return { fee: 2.9, days: 30, label: '¥500以内', extendFee: 1.9, extendDays: 15 };
+            else if (price <= 3000) return { fee: 3.9, days: 45, label: '¥500-3000', extendFee: 2.9, extendDays: 20 };
+            else return { fee: 5.9, days: 60, label: '¥3000以上', priority: true, extendFee: 3.9, extendDays: 30 };
+        }
+
+        function updatePriceInfo() {
+            const price = parseFloat(document.getElementById('itemPrice').value) || 0;
+            const hint = document.getElementById('priceHint');
+            const feeDisplay = document.getElementById('publishFee');
+            const daysDisplay = document.getElementById('displayDays');
+            if (price > 0) {
+                const info = getPriceInfo(price);
+                hint.textContent = `${info.label}，发布费 ¥${info.fee}，展示 ${info.days} 天${info.priority ? '，首页优先' : ''}`;
+                hint.classList.remove('hidden');
+                feeDisplay.innerHTML = `¥${info.fee.toFixed(2)}`;
+                daysDisplay.textContent = `展示 ${info.days} 天`;
+            } else { hint.classList.add('hidden'); feeDisplay.innerHTML = `¥0.00`; daysDisplay.textContent = ''; }
+        }
+
+        // 表单验证 (#16)
+        function validateForm() {
+            let isValid = true;
+            const fields = [
+                { id: 'itemName', error: 'itemNameError' },
+                { id: 'itemPrice', error: 'itemPriceError' },
+                { id: 'itemCategory', error: 'itemCategoryError' }
+            ];
+            
+            fields.forEach(field => {
+                const input = document.getElementById(field.id);
+                const error = document.getElementById(field.error);
+                if (!input.value) {
+                    input.classList.add('input-error');
+                    error.classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    input.classList.remove('input-error');
+                    error.classList.add('hidden');
+                }
+            });
+            
+            const phone = document.getElementById('phone').value;
+            const wechat = document.getElementById('wechat').value;
+            const contactError = document.getElementById('contactError');
+            if (!phone && !wechat) {
+                contactError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                contactError.classList.add('hidden');
+            }
+            
+            if (uploadedImages.length === 0) {
+                showToast('请上传至少一张商品图片', 'error');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        function handleSubmit() {
+            if (!validateForm()) return;
+            
+            const price = parseFloat(document.getElementById('itemPrice').value);
+            const info = getPriceInfo(price);
+            const name = document.getElementById('itemName').value;
+            const phone = document.getElementById('phone').value;
+            const contactInfo = phone ? phone.slice(-4) : document.getElementById('wechat').value.slice(-4);
+            
+            document.getElementById('paymentType').textContent = '发布费用';
+            document.getElementById('paymentAmount').textContent = '¥' + info.fee.toFixed(2);
+            document.getElementById('paymentDays').textContent = `展示 ${info.days} 天${info.priority ? ' · 首页优先' : ''}`;
+            document.getElementById('paymentNote').textContent = name.slice(0, 6) + contactInfo;
+            
+            // 支付倒计时 (#9)
+            startPaymentCountdown();
+            
+            document.getElementById('paymentModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        // 支付倒计时 (#9)
+        function startPaymentCountdown() {
+            let timeLeft = 15 * 60; // 15分钟
+            const countdownEl = document.getElementById('paymentCountdown');
+            
+            if (paymentTimer) clearInterval(paymentTimer);
+            
+            function updateCountdown() {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                countdownEl.textContent = `请在 ${minutes}:${seconds.toString().padStart(2, '0')} 内完成支付`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(paymentTimer);
+                    countdownEl.textContent = '支付超时，请重新提交';
+                    countdownEl.classList.add('text-red-500');
+                } else {
+                    timeLeft--;
+                }
+            }
+            
+            updateCountdown();
+            paymentTimer = setInterval(updateCountdown, 1000);
+        }
+
+        function switchPayment(method) {
+            const wechatBtn = document.getElementById('btn-wechat');
+            const alipayBtn = document.getElementById('btn-alipay');
+            const wechatQR = document.getElementById('qrcode-wechat');
+            const alipayQR = document.getElementById('qrcode-alipay');
+            const methodName = document.getElementById('paymentMethodName');
+            if (method === 'wechat') {
+                wechatBtn.className = 'flex-1 py-2.5 rounded-lg border-2 border-green-500 bg-green-50 text-green-600 font-medium flex items-center justify-center gap-2';
+                alipayBtn.className = 'flex-1 py-2.5 rounded-lg border-2 border-gray-200 text-gray-500 font-medium flex items-center justify-center gap-2';
+                wechatQR.classList.remove('hidden'); alipayQR.classList.add('hidden'); methodName.textContent = '微信';
+            } else {
+                alipayBtn.className = 'flex-1 py-2.5 rounded-lg border-2 border-blue-500 bg-blue-50 text-blue-600 font-medium flex items-center justify-center gap-2';
+                wechatBtn.className = 'flex-1 py-2.5 rounded-lg border-2 border-gray-200 text-gray-500 font-medium flex items-center justify-center gap-2';
+                alipayQR.classList.remove('hidden'); wechatQR.classList.add('hidden'); methodName.textContent = '支付宝';
+            }
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+            if (paymentTimer) clearInterval(paymentTimer);
+        }
+
+        function confirmPayment() {
+            document.getElementById('paymentModal').classList.add('hidden');
+            if (paymentTimer) clearInterval(paymentTimer);
+            
+            const orderCode = generateOrderCode();
+            currentOrderCode = orderCode;
+            const price = parseFloat(document.getElementById('itemPrice').value);
+            const info = getPriceInfo(price);
+            const order = {
+                code: orderCode, name: document.getElementById('itemName').value, price: price, category: document.getElementById('itemCategory').value,
+                description: document.getElementById('itemDesc').value, phone: document.getElementById('phone').value, wechat: document.getElementById('wechat').value,
+                images: uploadedImages.map(img => img.data), status: 'pending', publishFee: info.fee, displayDays: info.days,
+                createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + info.days * 24 * 60 * 60 * 1000).toISOString()
+            };
+            orders.push(order);
+            localStorage.setItem('zhixuan_orders', JSON.stringify(orders));
+            document.getElementById('generatedOrderCode').textContent = orderCode;
+            document.getElementById('successModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        // 复制订单码 (#17 动效)
+        function copyOrderCode() {
+            navigator.clipboard.writeText(currentOrderCode).then(() => {
+                const copyBtn = document.getElementById('copyBtn');
+                const copyIcon = document.getElementById('copyIcon');
+                const copyText = document.getElementById('copyText');
+                
+                copyIcon.setAttribute('data-lucide', 'check');
+                copyText.textContent = '已复制！';
+                copyBtn.classList.add('text-emerald-600');
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                    copyIcon.setAttribute('data-lucide', 'copy');
+                    copyText.textContent = '点击复制';
+                    copyBtn.classList.remove('text-emerald-600');
+                    lucide.createIcons();
+                }, 2000);
+            });
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+            showPage('home');
+            // 重置表单
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemPrice').value = '';
+            document.getElementById('itemCategory').value = '';
+            document.getElementById('itemDesc').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('wechat').value = '';
+            uploadedImages = [];
+            updateImagePreview();
+            updatePriceInfo();
+            // 清除错误状态
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+        }
+
+        function queryOrder() {
+            const code = document.getElementById('orderCodeInput').value.trim().toUpperCase();
+            if (!code) { showToast('请输入订单码', 'error'); return; }
+            const order = orders.find(o => o.code === code);
+            if (order) {
+                currentOrderCode = code;
+                displayOrderResult(order);
+                document.getElementById('orderResult').classList.remove('hidden');
+                document.getElementById('orderNotFound').classList.add('hidden');
+            } else {
+                document.getElementById('orderResult').classList.add('hidden');
+                document.getElementById('orderNotFound').classList.remove('hidden');
+            }
+            lucide.createIcons();
+        }
+
+        function displayOrderResult(order) {
+            document.getElementById('resultImage').src = order.images[0] || '';
+            document.getElementById('resultName').textContent = order.name;
+            document.getElementById('resultPrice').textContent = '¥' + order.price.toLocaleString();
+            document.getElementById('resultCategory').textContent = order.category;
+            document.getElementById('resultCode').textContent = order.code;
+            document.getElementById('resultDate').textContent = new Date(order.createdAt).toLocaleDateString('zh-CN');
+            const now = new Date(); const expiresAt = new Date(order.expiresAt);
+            const daysLeft = Math.max(0, Math.ceil((expiresAt - now) / (24 * 60 * 60 * 1000)));
+            const statusEl = document.getElementById('resultStatus'); const daysEl = document.getElementById('resultDaysLeft');
+            const actionsEl = document.getElementById('orderActions'); const soldNotice = document.getElementById('soldNotice');
+            if (order.status === 'sold') { statusEl.textContent = '已成交'; statusEl.className = 'font-bold text-emerald-600'; daysEl.textContent = '-'; actionsEl.classList.add('hidden'); soldNotice.classList.remove('hidden'); }
+            else if (order.status === 'expired' || daysLeft === 0) { statusEl.textContent = '已过期'; statusEl.className = 'font-bold text-gray-400'; daysEl.textContent = '已过期'; daysEl.className = 'font-bold text-red-500'; actionsEl.classList.remove('hidden'); soldNotice.classList.add('hidden'); document.getElementById('btnMarkSold').classList.add('hidden'); }
+            else if (order.status === 'pending') { statusEl.textContent = '审核中'; statusEl.className = 'font-bold text-amber-500'; daysEl.textContent = daysLeft + '天'; daysEl.className = 'font-bold text-blue-600'; actionsEl.classList.remove('hidden'); soldNotice.classList.add('hidden'); }
+            else { statusEl.textContent = '展示中'; statusEl.className = 'font-bold text-blue-600'; daysEl.textContent = daysLeft + '天'; daysEl.className = daysLeft <= 7 ? 'font-bold text-amber-500' : 'font-bold text-blue-600'; actionsEl.classList.remove('hidden'); soldNotice.classList.add('hidden'); document.getElementById('btnMarkSold').classList.remove('hidden'); }
+        }
+
+        function markAsSold() { document.getElementById('soldConfirmModal').classList.remove('hidden'); lucide.createIcons(); }
+        function closeSoldConfirmModal() { document.getElementById('soldConfirmModal').classList.add('hidden'); }
+        function confirmMarkSold() {
+            const orderIndex = orders.findIndex(o => o.code === currentOrderCode);
+            if (orderIndex !== -1) {
+                orders[orderIndex].status = 'sold';
+                localStorage.setItem('zhixuan_orders', JSON.stringify(orders));
+                closeSoldConfirmModal();
+                displayOrderResult(orders[orderIndex]);
+                showToast('恭喜！商品已标记为成交');
+            }
+        }
+
+        function showExtendModal() {
+            const order = orders.find(o => o.code === currentOrderCode);
+            if (!order) return;
+            const info = getPriceInfo(order.price);
+            document.getElementById('extendAmount').textContent = '¥' + info.extendFee.toFixed(2);
+            document.getElementById('extendDays').textContent = `延长${info.extendDays}天展示期`;
+            document.getElementById('extendNote').textContent = '延期+' + currentOrderCode;
+            document.getElementById('extendModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeExtendModal() { document.getElementById('extendModal').classList.add('hidden'); }
+        function confirmExtend() {
+            const orderIndex = orders.findIndex(o => o.code === currentOrderCode);
+            if (orderIndex !== -1) {
+                const order = orders[orderIndex];
+                const info = getPriceInfo(order.price);
+                const currentExpires = new Date(order.expiresAt);
+                const newExpires = new Date(currentExpires.getTime() + info.extendDays * 24 * 60 * 60 * 1000);
+                orders[orderIndex].expiresAt = newExpires.toISOString();
+                orders[orderIndex].status = 'active';
+                localStorage.setItem('zhixuan_orders', JSON.stringify(orders));
+                closeExtendModal();
+                displayOrderResult(orders[orderIndex]);
+                showToast('延期成功！已延长' + info.extendDays + '天');
+            }
+        }
+    </script>
+</body>
+</html>
