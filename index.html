@@ -1686,59 +1686,108 @@
             lucide.createIcons();
         }
 
-        // 商品详情弹窗 (#4) - V13: 适配优化数据结构
+        // ============================================
+        // 显示商品详情弹窗
+        // 修复：使用 getAllProducts() 查找数据库商品
+        // ============================================
         function showProductDetail(productId) {
-            const product = products.find(p => p.id === productId);
-            if (!product) return;
+            // 从所有商品（数据库 + 示例）中查找
+            const allProducts = getAllProducts();
+            const product = allProducts.find(p => p.id === productId || p.id === String(productId));
             
+            if (!product) {
+                console.error('商品未找到:', productId);
+                showToast('商品不存在或已下架', 'error');
+                return;
+            }
+            
+            console.log('显示商品详情:', product);
+            
+            // 设置图片
             currentProductImages = product.images || [product.image];
             currentImageIndex = 0;
             
-            // 渲染图片
+            // 渲染图片容器
             const container = document.getElementById('detailImageContainer');
-            container.style.transform = 'translateX(0)';
-            container.innerHTML = currentProductImages.map(img => `
-                <img src="${img}" class="w-full aspect-square object-cover flex-shrink-0" loading="lazy">
-            `).join('');
-            
-            // 渲染指示器
-            const indicators = document.getElementById('imageIndicators');
-            indicators.innerHTML = currentProductImages.map((_, i) => `
-                <button onclick="goToImage(${i})" class="w-2 h-2 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/50'} transition-all"></button>
-            `).join('');
-            
-            // 显示/隐藏箭头
-            document.getElementById('prevImageBtn').classList.toggle('hidden', currentProductImages.length <= 1);
-            document.getElementById('nextImageBtn').classList.toggle('hidden', currentProductImages.length <= 1);
-            
-            // 填充详情
-            document.getElementById('detailName').textContent = product.name;
-            document.getElementById('detailPrice').textContent = '¥' + product.price.toLocaleString();
-            document.getElementById('detailCategory').textContent = product.category;
-            document.querySelector('#detailLocation span').textContent = product.location;
-            document.querySelector('#detailViews span').textContent = product.views + '次浏览';
-            document.getElementById('detailDesc').textContent = product.description;
-            
-            // 联系方式
-            const phoneBtn = document.getElementById('detailPhone');
-            const wechatBtn = document.getElementById('detailWechat');
-            if (product.phone) {
-                phoneBtn.href = 'tel:' + product.phone;
-                phoneBtn.querySelector('span').textContent = product.phone;
-                phoneBtn.classList.remove('hidden');
-            } else {
-                phoneBtn.classList.add('hidden');
-            }
-            if (product.wechat) {
-                wechatBtn.dataset.wechat = product.wechat;
-                wechatBtn.querySelector('span').textContent = product.wechat;
-                wechatBtn.classList.remove('hidden');
-            } else {
-                wechatBtn.classList.add('hidden');
+            if (container) {
+                container.innerHTML = currentProductImages.map((img, index) => `
+                    <div class="w-full flex-shrink-0">
+                        <img src="${img}" alt="商品图片 ${index + 1}" class="w-full h-64 md:h-80 object-contain bg-gray-100">
+                    </div>
+                `).join('');
+                container.style.transform = 'translateX(0)';
             }
             
-            document.getElementById('productDetailModal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+            // 更新图片指示器
+            updateImageIndicators();
+            
+            // 填充商品信息
+            const nameEl = document.getElementById('detailName');
+            if (nameEl) nameEl.textContent = product.name;
+            
+            const priceEl = document.getElementById('detailPrice');
+            if (priceEl) priceEl.textContent = '¥' + product.price.toLocaleString();
+            
+            const originalPriceEl = document.getElementById('detailOriginalPrice');
+            if (originalPriceEl) {
+                if (product.original_price) {
+                    originalPriceEl.textContent = '¥' + product.original_price.toLocaleString();
+                    originalPriceEl.classList.remove('hidden');
+                } else {
+                    originalPriceEl.classList.add('hidden');
+                }
+            }
+            
+            const descEl = document.getElementById('detailDesc');
+            if (descEl) descEl.textContent = product.description || '暂无描述';
+            
+            const locationEl = document.getElementById('detailLocation');
+            if (locationEl) locationEl.textContent = product.location || '未知位置';
+            
+            const categoryEl = document.getElementById('detailCategory');
+            if (categoryEl) categoryEl.textContent = product.category || '其他';
+            
+            const viewsEl = document.getElementById('detailViews');
+            if (viewsEl) viewsEl.textContent = product.views || 0;
+            
+            // ========== 显示联系方式 ==========
+            const contactSection = document.getElementById('detailContact');
+            if (contactSection) {
+                let contactHTML = '';
+                
+                if (product.phone) {
+                    contactHTML += `
+                        <div class="flex items-center gap-2 text-gray-700">
+                            <i data-lucide="phone" class="w-4 h-4 text-blue-500"></i>
+                            <span>电话：${product.phone}</span>
+                        </div>
+                    `;
+                }
+                
+                if (product.wechat) {
+                    contactHTML += `
+                        <div class="flex items-center gap-2 text-gray-700 mt-2">
+                            <i data-lucide="message-circle" class="w-4 h-4 text-green-500"></i>
+                            <span>微信：${product.wechat}</span>
+                        </div>
+                    `;
+                }
+                
+                if (!product.phone && !product.wechat) {
+                    contactHTML = '<p class="text-gray-400">卖家未提供联系方式</p>';
+                }
+                
+                contactSection.innerHTML = contactHTML;
+                lucide.createIcons();
+            }
+            
+            // 显示弹窗
+            const modal = document.getElementById('productDetailModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+            
             lucide.createIcons();
         }
 
