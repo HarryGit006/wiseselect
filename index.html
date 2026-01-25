@@ -886,7 +886,14 @@
                     </div>
                 </div>
             </div>
-
+            <!-- 所在城市 -->
+            <div>
+                <label class="text-sm text-gray-600 mb-1 block">所在城市</label>
+                <input type="text" id="itemLocation" 
+                    placeholder="例如：北京·朝阳、上海·浦东、深圳·南山" 
+                    class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-400 focus:bg-white transition-all">
+                <p class="text-xs text-gray-400 mt-1">填写城市和区域，方便买家同城交易</p>
+            </div>
             <div class="bg-blue-50 rounded-2xl p-5 md:p-6 mb-4 md:mb-6 border border-blue-100">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
@@ -1694,7 +1701,7 @@
         // 显示商品详情弹窗
         // 匹配 productDetailModal HTML 结构
         // ============================================
-        function showProductDetail(productId) {
+        async function showProductDetail(productId) {
             // 从所有商品（数据库 + 示例）中查找
             const allProducts = getAllProducts();
             const product = allProducts.find(p => p.id === productId || p.id === String(productId));
@@ -1706,7 +1713,24 @@
             }
             
             console.log('显示商品详情:', product);
-            
+            // ========== 更新浏览量 ==========
+            // 只对数据库商品更新浏览量（示例商品不更新）
+            if (product.id && typeof product.id === 'string' && product.id.length > 10) {
+                // 这是数据库商品（UUID格式）
+                try {
+                    const { error: viewError } = await supabaseClient
+                        .from('products')
+                        .update({ views: (product.views || 0) + 1 })
+                        .eq('id', product.id);
+                    
+                    if (!viewError) {
+                        product.views = (product.views || 0) + 1;
+                        console.log('浏览量已更新:', product.views);
+                    }
+                } catch (err) {
+                    console.log('更新浏览量失败:', err);
+                }
+            }
             // ========== 1. 设置图片轮播 ==========
             currentProductImages = product.images || [product.image];
             currentImageIndex = 0;
@@ -2177,6 +2201,7 @@
             const description = document.getElementById('itemDesc').value;
             const phone = document.getElementById('phone').value;
             const wechat = document.getElementById('wechat').value;
+            const location = document.getElementById('itemLocation')?.value || '未填写';
             const info = getPriceInfo(price);
             
             // 4. 显示加载状态
@@ -2235,7 +2260,7 @@
                         images: imageUrls.length > 0 ? imageUrls : null,  // 图片URL数组
                         phone: phone || null,           // 手机号（可选）
                         wechat: wechat || null,         // 微信号（可选）
-                        location: '未填写',              // 位置
+                        location: location,             // 位置
                         status: 'active',               // 状态：直接上架
                         publish_fee: isAdminMode() ? 0 : info.fee,          // 发布费
                         display_days: info.days,        // 展示天数
