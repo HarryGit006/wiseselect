@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -1690,6 +1690,10 @@
         // 显示商品详情弹窗
         // 修复：使用 getAllProducts() 查找数据库商品
         // ============================================
+        // ============================================
+        // 显示商品详情弹窗
+        // 匹配 productDetailModal HTML 结构
+        // ============================================
         function showProductDetail(productId) {
             // 从所有商品（数据库 + 示例）中查找
             const allProducts = getAllProducts();
@@ -1703,16 +1707,15 @@
             
             console.log('显示商品详情:', product);
             
-            // 设置图片
+            // ========== 1. 设置图片轮播 ==========
             currentProductImages = product.images || [product.image];
             currentImageIndex = 0;
             
-            // 渲染图片容器
             const container = document.getElementById('detailImageContainer');
             if (container) {
                 container.innerHTML = currentProductImages.map((img, index) => `
-                    <div class="w-full flex-shrink-0">
-                        <img src="${img}" alt="商品图片 ${index + 1}" class="w-full h-64 md:h-80 object-contain bg-gray-100">
+                    <div class="w-full flex-shrink-0 aspect-square">
+                        <img src="${img}" alt="商品图片 ${index + 1}" class="w-full h-full object-contain bg-gray-100">
                     </div>
                 `).join('');
                 container.style.transform = 'translateX(0)';
@@ -1721,79 +1724,159 @@
             // 更新图片指示器
             updateImageIndicators();
             
-            // 填充商品信息
-            const nameEl = document.getElementById('detailName');
-            if (nameEl) nameEl.textContent = product.name;
-            
-            const priceEl = document.getElementById('detailPrice');
-            if (priceEl) priceEl.textContent = '¥' + product.price.toLocaleString();
-            
-            const originalPriceEl = document.getElementById('detailOriginalPrice');
-            if (originalPriceEl) {
-                if (product.original_price) {
-                    originalPriceEl.textContent = '¥' + product.original_price.toLocaleString();
-                    originalPriceEl.classList.remove('hidden');
+            // 显示/隐藏左右箭头
+            const prevBtn = document.getElementById('prevImageBtn');
+            const nextBtn = document.getElementById('nextImageBtn');
+            if (prevBtn && nextBtn) {
+                if (currentProductImages.length <= 1) {
+                    prevBtn.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
                 } else {
-                    originalPriceEl.classList.add('hidden');
+                    prevBtn.classList.remove('hidden');
+                    nextBtn.classList.remove('hidden');
                 }
             }
             
-            const descEl = document.getElementById('detailDesc');
-            if (descEl) descEl.textContent = product.description || '暂无描述';
+            // ========== 2. 填充商品信息 ==========
+            // 商品名称
+            const nameEl = document.getElementById('detailName');
+            if (nameEl) nameEl.textContent = product.name || '未知商品';
             
-            const locationEl = document.getElementById('detailLocation');
-            if (locationEl) locationEl.textContent = product.location || '未知位置';
+            // 价格
+            const priceEl = document.getElementById('detailPrice');
+            if (priceEl) priceEl.textContent = '¥' + (product.price || 0).toLocaleString();
             
+            // 分类
             const categoryEl = document.getElementById('detailCategory');
             if (categoryEl) categoryEl.textContent = product.category || '其他';
             
-            const viewsEl = document.getElementById('detailViews');
-            if (viewsEl) viewsEl.textContent = product.views || 0;
-            
-            // ========== 显示联系方式 ==========
-            const contactSection = document.getElementById('detailContact');
-            if (contactSection) {
-                let contactHTML = '';
-                
-                if (product.phone) {
-                    contactHTML += `
-                        <div class="flex items-center gap-2 text-gray-700">
-                            <i data-lucide="phone" class="w-4 h-4 text-blue-500"></i>
-                            <span>电话：${product.phone}</span>
-                        </div>
-                    `;
+            // 位置（内部 span）
+            const locationEl = document.getElementById('detailLocation');
+            if (locationEl) {
+                const locationSpan = locationEl.querySelector('span');
+                if (locationSpan) {
+                    locationSpan.textContent = product.location || '未知位置';
                 }
-                
-                if (product.wechat) {
-                    contactHTML += `
-                        <div class="flex items-center gap-2 text-gray-700 mt-2">
-                            <i data-lucide="message-circle" class="w-4 h-4 text-green-500"></i>
-                            <span>微信：${product.wechat}</span>
-                        </div>
-                    `;
-                }
-                
-                if (!product.phone && !product.wechat) {
-                    contactHTML = '<p class="text-gray-400">卖家未提供联系方式</p>';
-                }
-                
-                contactSection.innerHTML = contactHTML;
-                lucide.createIcons();
             }
             
-            // 显示弹窗
+            // 浏览量（内部 span）
+            const viewsEl = document.getElementById('detailViews');
+            if (viewsEl) {
+                const viewsSpan = viewsEl.querySelector('span');
+                if (viewsSpan) {
+                    viewsSpan.textContent = product.views || 0;
+                }
+            }
+            
+            // 描述
+            const descEl = document.getElementById('detailDesc');
+            if (descEl) descEl.textContent = product.description || '暂无描述';
+            
+            // ========== 3. 联系方式 ==========
+            // 电话
+            const phoneEl = document.getElementById('detailPhone');
+            if (phoneEl) {
+                if (product.phone) {
+                    phoneEl.href = 'tel:' + product.phone;
+                    phoneEl.querySelector('span').textContent = product.phone;
+                    phoneEl.classList.remove('hidden');
+                } else {
+                    phoneEl.classList.add('hidden');
+                }
+            }
+            
+            // 微信
+            const wechatEl = document.getElementById('detailWechat');
+            if (wechatEl) {
+                if (product.wechat) {
+                    wechatEl.querySelector('span').textContent = product.wechat;
+                    wechatEl.dataset.wechat = product.wechat;  // 存储微信号用于复制
+                    wechatEl.classList.remove('hidden');
+                } else {
+                    wechatEl.classList.add('hidden');
+                }
+            }
+            
+            // ========== 4. 显示弹窗 ==========
             const modal = document.getElementById('productDetailModal');
             if (modal) {
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
             }
             
+            // 刷新图标
             lucide.createIcons();
         }
-
+        
+        // ============================================
+        // 复制微信号
+        // ============================================
+        function copyWechat() {
+            const wechatEl = document.getElementById('detailWechat');
+            const wechatId = wechatEl ? wechatEl.dataset.wechat : '';
+            
+            if (wechatId) {
+                navigator.clipboard.writeText(wechatId).then(() => {
+                    showToast('微信号已复制: ' + wechatId, 'success');
+                }).catch(() => {
+                    showToast('复制失败，请手动复制: ' + wechatId, 'error');
+                });
+            }
+        }
+        
+        // ============================================
+        // 关闭商品详情弹窗
+        // ============================================
         function closeProductDetail() {
-            document.getElementById('productDetailModal').classList.add('hidden');
-            document.body.style.overflow = '';
+            const modal = document.getElementById('productDetailModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // ============================================
+        // 更新图片指示器
+        // ============================================
+        function updateImageIndicators() {
+            const indicators = document.getElementById('imageIndicators');
+            if (!indicators) return;
+            
+            indicators.innerHTML = currentProductImages.map((_, index) => `
+                <button onclick="goToImage(${index})" 
+                    class="w-2 h-2 rounded-full transition-all ${index === currentImageIndex ? 'bg-white w-6' : 'bg-white/50'}">
+                </button>
+            `).join('');
+        }
+        
+        // ============================================
+        // 图片轮播控制
+        // ============================================
+        function prevImage() {
+            if (currentImageIndex > 0) {
+                currentImageIndex--;
+                updateImagePosition();
+            }
+        }
+        
+        function nextImage() {
+            if (currentImageIndex < currentProductImages.length - 1) {
+                currentImageIndex++;
+                updateImagePosition();
+            }
+        }
+        
+        function goToImage(index) {
+            currentImageIndex = index;
+            updateImagePosition();
+        }
+        
+        function updateImagePosition() {
+            const container = document.getElementById('detailImageContainer');
+            if (container) {
+                container.style.transform = `translateX(-${currentImageIndex * 100}%)`;
+            }
+            updateImageIndicators();
         }
 
         // 图片轮播 (#5)
