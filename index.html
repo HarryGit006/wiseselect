@@ -1414,7 +1414,14 @@
         
         // 初始化 Supabase 客户端
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
+        // ============================================
+        // 管理员模式检查
+        // 访问 https://wiseselect.ai?admin=wiseselect2025 即为管理员
+        // ============================================
+        function isAdminMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('admin') === 'wiseselect2025';
+        }
         // 数据库商品（从 Supabase 加载）
         let dbProducts = [];
         
@@ -2018,25 +2025,138 @@
             if (paymentTimer) clearInterval(paymentTimer);
         }
 
-        function confirmPayment() {
+                // ============================================
+        // 确认支付并发布商品到 Supabase
+        // 功能：上传图片 + 保存商品信息到数据库
+        // ============================================
+        async function confirmPayment() {
+            // 1. 关闭支付弹窗
             document.getElementById('paymentModal').classList.add('hidden');
             if (paymentTimer) clearInterval(paymentTimer);
             
+            // 2. 生成订单码（格式：ZX + 日期 + 4位随机字母）
             const orderCode = generateOrderCode();
             currentOrderCode = orderCode;
+            
+            // 3. 获取表单数据
+            const name = document.getElementById('itemName').value;
             const price = parseFloat(document.getElementById('itemPrice').value);
+            const category = document.getElementById('itemCategory').value;
+            const description = document.getElementById('itemDesc').value;
+            const phone = document.getElementById('phone').value;
+            const wechat = document.getElementById('wechat').value;
             const info = getPriceInfo(price);
-            const order = {
-                code: orderCode, name: document.getElementById('itemName').value, price: price, category: document.getElementById('itemCategory').value,
-                description: document.getElementById('itemDesc').value, phone: document.getElementById('phone').value, wechat: document.getElementById('wechat').value,
-                images: uploadedImages.map(img => img.data), status: 'pending', publishFee: info.fee, displayDays: info.days,
-                createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + info.days * 24 * 60 * 60 * 1000).toISOString()
-            };
-            orders.push(order);
-            localStorage.setItem('zhixuan_orders', JSON.stringify(orders));
-            document.getElementById('generatedOrderCode').textContent = orderCode;
-            document.getElementById('successModal').classList.remove('hidden');
-            lucide.createIcons();
+            
+            // 4. 显示加载状态
+            showToast('正在发布商品...', 'info');
+            
+            try {
+                // ========== 5. 上传图片到 Supabase Storage ==========
+                const imageUrls = [];
+                
+                for (let i = 0; i < uploadedImages.length; i++) {
+                    const imageData = uploadedImages[i].data;
+                    
+                    // 5.1 将 base64 转换为 Blob
+                    const response = await fetch(imageData);
+                    const blob = await response.blob();
+                    
+                    // 5.2 确定文件扩展名
+                    const fileExt = imageData.includes('image/png') ? 'png' : 'jpg';
+                    
+                    // 5.3 生成文件路径（订单码/序号.扩展名）
+                    const fileName = `${orderCode}/${i}.${fileExt}`;
+                    
+                    // 5.4 上传到 Supabase Storage
+                    const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                        .from('product-images')
+                        .upload(fileName, blob, { 
+                            contentType: `image/${fileExt}`,
+                            cacheControl: '3600'
+                        });
+                    
+                    if (!uploadError) {
+                        // 5.5 获取图片公开 URL
+                        const { data: urlData } = supabaseClient.storage
+                            .from('product-images')
+                            .getPublicUrl(fileName);
+                        imageUrls.push(urlData.publicUrl);
+                        console.log('✅ 图片上传成功:', fileName);
+                    } else {
+                        console.error('❌ 图片上传失败:', uploadError);
+                    }
+                }
+                
+                // ========== 6. 计算过期时间 ==========
+                const expiresAt = new Date();
+                expiresAt.setDate(expiresAt.getDate() + info.days);
+                
+                // ========== 7. 保存商品到 Supabase 数据库 ==========
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .insert({
+                        order_code: orderCode,          // 订单码
+                        name: name,                     // 商品名称
+                        price: price,                   // 价格
+                        category: category,             // 分类
+                        description: description,       // 描述
+                        images: imageUrls.length > 0 ? imageUrls : null,  // 图片URL数组
+                        phone: phone || null,           // 手机号（可选）
+                        wechat: wechat || null,         // 微信号（可选）
+                        location: '未填写',              // 位置
+                        status: 'active',               // 状态：直接上架
+                        publish_fee: isAdminMode() ? 0 : info.fee,          // 发布费
+                        display_days: info.days,        // 展示天数
+                        views: 0,                       // 初始浏览次数
+                        expires_at: expiresAt.toISOString()  // 过期时间
+                    })
+                    .select();
+                
+                // 8. 检查是否保存成功
+                if (error) {
+                    console.error('❌ 发布失败:', error);
+                    showToast('发布失败: ' + error.message, 'error');
+                    return;
+                }
+                
+                console.log('✅ 商品发布成功:', data);
+                
+                // ========== 9. 同时保存到本地 localStorage（兼容原有逻辑）==========
+                const order = {
+                    code: orderCode,
+                    name: name,
+                    price: price,
+                    category: category,
+                    description: description,
+                    phone: phone,
+                    wechat: wechat,
+                    images: imageUrls.length > 0 ? imageUrls : uploadedImages.map(img => img.data),
+                    status: 'active',
+                    publishFee: info.fee,
+                    displayDays: info.days,
+                    createdAt: new Date().toISOString(),
+                    expiresAt: expiresAt.toISOString()
+                };
+                orders.push(order);
+                localStorage.setItem('zhixuan_orders', JSON.stringify(orders));
+                
+                // ========== 10. 显示成功弹窗 ==========
+                document.getElementById('generatedOrderCode').textContent = orderCode;
+                document.getElementById('successModal').classList.remove('hidden');
+                lucide.createIcons();
+                
+                // 11. 刷新商品列表（显示新发布的商品）
+                await loadProductsFromDB();
+                renderProducts();
+                
+                // 12. 显示成功提示
+                showToast('🎉 商品发布成功！', 'success');
+                
+            } catch (err) {
+                // 13. 捕获网络错误
+                console.error('❌ 发布出错:', err);
+                showToast('发布出错，请检查网络连接', 'error');
+            }
         }
 
         // 复制订单码 (#17 动效)
