@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI智选二手平台 - 让闲置重获新生 (V17)</title>
+    <title>AI智选二手平台 - 让闲置重获新生</title>
     
     <!-- SEO Meta标签 (#10) -->
     <meta name="description" content="AI智选二手平台，AI精准匹配推送，让闲置重获新生。简单发布，智能推荐，零佣金成交。">
@@ -1156,16 +1156,12 @@
             <p class="text-gray-500 text-sm mb-6">扫描下方二维码添加客服微信</p>
             
             <!-- 客服二维码占位 -->
-            <div class="w-48 h-48 mx-auto bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center mb-4">
-                <div class="text-center text-gray-400">
-                    <i data-lucide="qr-code" class="w-12 h-12 mx-auto mb-2"></i>
-                    <p class="text-sm">客服微信二维码</p>
-                    <p class="text-xs mt-1">请替换为真实二维码</p>
-                </div>
+            <div class="w-48 h-48 mx-auto">
+                    <img src="service-qrcode.png" alt="客服微信二维码" class="w-full h-full object-contain rounded-xl">
             </div>
             
             <p class="text-sm text-gray-600 mb-4">
-                或添加微信：<strong class="text-blue-600">zhixuan_service</strong>
+                或添加微信：<strong class="text-blue-600">715284059</strong>
             </p>
             
             <button onclick="closeContactModal()" class="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-200 transition-all">
@@ -1231,13 +1227,8 @@
                 <!-- 收款码 (#8 优化占位提示) -->
                 <div class="bg-gray-50 rounded-xl p-4 md:p-6 text-center mb-4">
                     <div id="qrcode-wechat" class="qrcode-container">
-                        <div class="w-44 h-44 md:w-48 md:h-48 mx-auto bg-white rounded-xl border-2 border-dashed border-green-300 flex items-center justify-center">
-                            <div class="text-center text-gray-400 p-4">
-                                <i data-lucide="qr-code" class="w-10 h-10 mx-auto mb-2 text-green-400"></i>
-                                <p class="text-sm font-medium text-green-600">微信收款码</p>
-                                <p class="text-xs mt-1 text-gray-400">尺寸：300x300px</p>
-                                <p class="text-xs text-gray-400">格式：PNG/JPG</p>
-                            </div>
+                        <div class="w-44 h-44 md:w-48 md:h-48 mx-auto bg-white rounded-xl overflow-hidden">
+                            <img src="payment-qrcode.png" alt="微信收款码" class="w-full h-full object-contain">
                         </div>
                     </div>
                     <div id="qrcode-alipay" class="qrcode-container hidden">
