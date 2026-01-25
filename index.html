@@ -1097,60 +1097,75 @@
         </div>
     </div>
 
-    <!-- 商品详情弹窗 (#4 #5) -->
-    <div id="productDetailModal" class="hidden fixed inset-0 bg-black/60 flex items-end md:items-center justify-center z-50">
-        <div class="bg-white w-full md:max-w-lg md:rounded-2xl rounded-t-3xl max-h-[90vh] overflow-hidden animate-slide-up md:animate-bounce-in">
-            <div class="relative">
-                <!-- 图片轮播 (#5) -->
-                <div class="relative aspect-square bg-gray-100 overflow-hidden">
-                    <div id="detailImageContainer" class="flex transition-transform duration-300">
-                        <!-- 图片由JS动态生成 -->
-                    </div>
-                    <!-- 轮播指示器 -->
-                    <div id="imageIndicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2"></div>
-                    <!-- 左右箭头 -->
-                    <button onclick="prevImage()" id="prevImageBtn" class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
-                        <i data-lucide="chevron-left" class="w-6 h-6"></i>
-                    </button>
-                    <button onclick="nextImage()" id="nextImageBtn" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
-                        <i data-lucide="chevron-right" class="w-6 h-6"></i>
-                    </button>
-                </div>
-                <button onclick="closeProductDetail()" class="absolute top-4 right-4 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-all">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-            <div class="p-5 max-h-[50vh] overflow-y-auto">
-                <div class="flex items-start justify-between gap-4 mb-4">
-                    <h3 id="detailName" class="text-xl font-bold text-gray-800"></h3>
-                    <span id="detailPrice" class="text-2xl font-bold text-blue-600 whitespace-nowrap"></span>
-                </div>
-                <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                    <span id="detailCategory" class="bg-gray-100 px-2 py-1 rounded"></span>
-                    <span id="detailLocation" class="flex items-center gap-1">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        <span></span>
-                    </span>
-                    <span id="detailViews" class="flex items-center gap-1">
-                        <i data-lucide="eye" class="w-4 h-4"></i>
-                        <span></span>
-                    </span>
-                </div>
-                <p id="detailDesc" class="text-gray-600 text-sm leading-relaxed mb-6"></p>
-                <div class="bg-blue-50 rounded-xl p-4 mb-4">
-                    <p class="text-sm text-gray-600 mb-3">联系卖家</p>
-                    <div class="flex gap-3">
-                        <a id="detailPhone" href="" class="flex-1 bg-emerald-500 text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-emerald-600 transition-all">
-                            <i data-lucide="phone" class="w-4 h-4"></i>
-                            <span></span>
-                        </a>
-                        <button id="detailWechat" onclick="copyWechat()" class="flex-1 bg-green-500 text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-green-600 transition-all">
-                            <i data-lucide="message-circle" class="w-4 h-4"></i>
-                            <span></span>
+    <!-- 商品详情弹窗 (移动端优化版) -->
+    <div id="productDetailModal" class="hidden fixed inset-0 bg-black/60 z-50 overflow-y-auto">
+        <div class="min-h-screen flex items-end md:items-center justify-center p-0 md:p-4">
+            <div class="bg-white w-full md:max-w-lg md:rounded-2xl rounded-t-3xl overflow-hidden animate-slide-up md:animate-bounce-in">
+                
+                <!-- 图片区域 (移动端缩小) -->
+                <div class="relative">
+                    <div class="relative h-64 md:h-80 bg-gray-100 overflow-hidden">
+                        <div id="detailImageContainer" class="flex h-full transition-transform duration-300">
+                            <!-- 图片由JS动态生成 -->
+                        </div>
+                        <!-- 轮播指示器 -->
+                        <div id="imageIndicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2"></div>
+                        <!-- 左右箭头 -->
+                        <button onclick="prevImage()" id="prevImageBtn" class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
+                            <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                        </button>
+                        <button onclick="nextImage()" id="nextImageBtn" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
+                            <i data-lucide="chevron-right" class="w-6 h-6"></i>
                         </button>
                     </div>
+                    <!-- 关闭按钮 -->
+                    <button onclick="closeProductDetail()" class="absolute top-4 right-4 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-all z-10">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
                 </div>
-                <p class="text-xs text-gray-400 text-center">提示：请优先选择同城面交，当面验货更安全</p>
+                
+                <!-- 商品信息区域 -->
+                <div class="p-5">
+                    <!-- 名称和价格 -->
+                    <div class="flex items-start justify-between gap-4 mb-4">
+                        <h3 id="detailName" class="text-xl font-bold text-gray-800"></h3>
+                        <span id="detailPrice" class="text-2xl font-bold text-blue-600 whitespace-nowrap"></span>
+                    </div>
+                    
+                    <!-- 分类、位置、浏览量 -->
+                    <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                        <span id="detailCategory" class="bg-gray-100 px-2 py-1 rounded"></span>
+                        <span id="detailLocation" class="flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span></span>
+                        </span>
+                        <span id="detailViews" class="flex items-center gap-1">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                            <span></span>
+                        </span>
+                    </div>
+                    
+                    <!-- 描述 -->
+                    <p id="detailDesc" class="text-gray-600 text-sm leading-relaxed mb-4"></p>
+                    
+                    <!-- 联系方式 (始终显示在底部) -->
+                    <div class="bg-blue-50 rounded-xl p-4 mb-4">
+                        <p class="text-sm text-gray-600 mb-3">联系卖家</p>
+                        <div class="flex gap-3">
+                            <a id="detailPhone" href="" class="flex-1 bg-emerald-500 text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-emerald-600 transition-all">
+                                <i data-lucide="phone" class="w-4 h-4"></i>
+                                <span></span>
+                            </a>
+                            <button id="detailWechat" onclick="copyWechat()" class="flex-1 bg-green-500 text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-green-600 transition-all">
+                                <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                <span></span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 提示 -->
+                    <p class="text-xs text-gray-400 text-center pb-4">提示：请优先选择同城面交，当面验货更安全</p>
+                </div>
             </div>
         </div>
     </div>
@@ -1738,7 +1753,7 @@
             const container = document.getElementById('detailImageContainer');
             if (container) {
                 container.innerHTML = currentProductImages.map((img, index) => `
-                    <div class="w-full flex-shrink-0 aspect-square">
+                    <div class="w-full flex-shrink-0 h-full">
                         <img src="${img}" alt="商品图片 ${index + 1}" class="w-full h-full object-contain bg-gray-100">
                     </div>
                 `).join('');
