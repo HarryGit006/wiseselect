@@ -1170,6 +1170,33 @@
         </div>
     </div>
 
+    <!-- 全屏图片查看器 -->
+    <div id="imageViewer" class="hidden fixed inset-0 bg-black z-[60] flex items-center justify-center">
+        <!-- 关闭按钮 -->
+        <button onclick="closeImageViewer()" class="absolute top-4 right-4 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all z-10">
+            <i data-lucide="x" class="w-8 h-8"></i>
+        </button>
+        
+        <!-- 图片计数 -->
+        <div id="imageViewerCount" class="absolute top-4 left-4 text-white text-sm bg-black/50 px-3 py-1 rounded-full"></div>
+        
+        <!-- 图片容器 -->
+        <div id="imageViewerContainer" class="w-full h-full flex items-center justify-center overflow-hidden">
+            <img id="imageViewerImg" src="" alt="商品图片" class="max-w-full max-h-full object-contain" onclick="event.stopPropagation()">
+        </div>
+        
+        <!-- 左右箭头 -->
+        <button onclick="viewerPrevImage()" id="viewerPrevBtn" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all">
+            <i data-lucide="chevron-left" class="w-8 h-8"></i>
+        </button>
+        <button onclick="viewerNextImage()" id="viewerNextBtn" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all">
+            <i data-lucide="chevron-right" class="w-8 h-8"></i>
+        </button>
+        
+        <!-- 点击背景关闭 -->
+        <div class="absolute inset-0 -z-10" onclick="closeImageViewer()"></div>
+    </div>
+
     <!-- 联系客服弹窗 (#20) -->
     <div id="contactModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center animate-bounce-in">
@@ -1754,7 +1781,9 @@
             if (container) {
                 container.innerHTML = currentProductImages.map((img, index) => `
                     <div class="w-full flex-shrink-0 h-full">
-                        <img src="${img}" alt="商品图片 ${index + 1}" class="w-full h-full object-contain bg-gray-100">
+                        <img src="${img}" alt="商品图片 ${index + 1}"
+                            class="w-full h-full object-contain bg-gray-100 cursor-zoom-in"
+                            onclick="openImageViewer(${index})">
                     </div>
                 `).join('');
                 container.style.transform = 'translateX(0)';
@@ -1845,6 +1874,60 @@
             
             // 刷新图标
             lucide.createIcons();
+        }
+        
+        // ============================================
+        // 全屏图片查看器
+        // ============================================
+        let viewerImageIndex = 0;
+        
+        function openImageViewer(index = 0) {
+            viewerImageIndex = index;
+            updateViewerImage();
+            document.getElementById('imageViewer').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+        }
+        
+        function closeImageViewer() {
+            document.getElementById('imageViewer').classList.add('hidden');
+        }
+        
+        function updateViewerImage() {
+            const img = document.getElementById('imageViewerImg');
+            const count = document.getElementById('imageViewerCount');
+            const prevBtn = document.getElementById('viewerPrevBtn');
+            const nextBtn = document.getElementById('viewerNextBtn');
+            
+            if (img && currentProductImages[viewerImageIndex]) {
+                img.src = currentProductImages[viewerImageIndex];
+            }
+            
+            if (count) {
+                count.textContent = `${viewerImageIndex + 1} / ${currentProductImages.length}`;
+            }
+            
+            // 隐藏/显示箭头
+            if (prevBtn) {
+                prevBtn.classList.toggle('hidden', viewerImageIndex === 0);
+            }
+            if (nextBtn) {
+                nextBtn.classList.toggle('hidden', viewerImageIndex === currentProductImages.length - 1);
+            }
+        }
+        
+        function viewerPrevImage() {
+            if (viewerImageIndex > 0) {
+                viewerImageIndex--;
+                updateViewerImage();
+            }
+        }
+        
+        function viewerNextImage() {
+            if (viewerImageIndex < currentProductImages.length - 1) {
+                viewerImageIndex++;
+                updateViewerImage();
+            }
         }
         
         // ============================================
