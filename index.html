@@ -2223,7 +2223,7 @@
             document.getElementById('paymentType').textContent = '发布费用';
             document.getElementById('paymentAmount').textContent = '¥' + info.fee.toFixed(2);
             document.getElementById('paymentDays').textContent = `展示 ${info.days} 天${info.priority ? ' · 首页优先' : ''}`;
-            document.getElementById('paymentNote').textContent = name.slice(0, 6) + contactInfo;
+            document.getElementById('paymentNote').textContent = 'AIWS-' + name.slice(0, 6) + contactInfo;
             
             // 支付倒计时 (#9)
             startPaymentCountdown();
