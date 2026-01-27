@@ -1520,69 +1520,38 @@
             initScrollEffects();
         });
 
-        // V18: 从 Supabase 数据库加载商品 (最优修改版)
-        async function loadProductsFromDB(category = 'all') {
+        
+
+        // ========================================
+        // 2. 修改 loadProducts() 函数
+        // ========================================
+        // 找到 loadProducts 函数，添加 .eq('status', 'active') 这一行
+
+        async function loadProducts(category = 'all') {
             try {
-                // 1. 构建基础查询：核心是只查 status = 'active'
-                let query = supabaseClient
+                let query = supabase
                     .from('products')
                     .select('*')
-                    .eq('status', 'active') 
+                    .eq('status', 'active')  // 🔑 添加这一行！只显示展示中的商品
                     .order('created_at', { ascending: false });
-                    // 2. 动态添加分类筛选
-                // 如果传入了分类且不是 'all'，则只查该分类
+        
+                // 如果有分类筛选
                 if (category && category !== 'all') {
-                    query = query.eq('category', category);
-                }
+                query = query.eq('category', category);
+               }
         
-                // 3. 执行查询
-                const { data, error } = await query;
+                const { data: products, error } = await query;
         
-                if (error) {
-                    console.error('加载商品失败:', error);
-                    if (typeof showToast === 'function') showToast('加载商品失败', 'error');
-                    return;
-                }
+                if (error) throw error;
         
-                // 4. 处理数据
-                if (data) {
-                    // 保留你原本完美的数据转换逻辑
-                    dbProducts = data.map(item => ({
-                        id: item.id,
-                        order_code: item.order_code,
-                        name: item.name,
-                        price: parseFloat(item.price),
-                        original_price: item.original_price ? parseFloat(item.original_price) : null,
-                        image: item.images && item.images[0] ? item.images[0] : 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=400&h=300&fit=crop',
-                        images: item.images || [],
-                        location: item.location || '未知位置',
-                        category: item.category,
-                        status: item.status,
-                        is_hot: item.views > 100,
-                        views: item.views || 0,
-                        description: item.description || '',
-                        phone: item.phone || '',
-                        wechat: item.wechat || '',
-                        publish_fee: parseFloat(item.publish_fee) || 0,
-                        created_at: item.created_at,
-                        expires_at: item.expires_at
-                    }));
-
-                    console.log(`已加载 ${category} 分类下的 ${dbProducts.length} 个商品`);
-
-                    // 5. 关键步骤：调用渲染函数更新页面
-                    // 请确认你的渲染函数名是 renderProducts 还是 renderGoods
-                    if (typeof renderProducts === 'function') {
-                        renderProducts(dbProducts); 
-                    } else if (typeof renderGoods === 'function') {
-                        renderGoods(); // 如果你的代码里用的是这个名字
-                    }
-                }
-            } catch (err) {
-                console.error('数据库连接错误:', err);
-                if (typeof showToast === 'function') showToast('网络连接错误', 'error');
+                // 渲染商品列表
+                renderProducts(products || []);
+        
+            } catch (error) {
+                console.error('加载商品失败:', error);
+                showToast('加载失败，请刷新页面重试', 'error');
             }
-        }   
+        }
 
         // V18: 获取所有商品（数据库 + 示例数据）
         function getAllProducts() {
@@ -1603,46 +1572,37 @@
             });
         }
 
-        // Toast提示 (#15) - 增强版 (支持 warning 状态)
+        // Toast提示 (#15) - ( )gemini 修改失败后，改回来
         function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            // 🛡️ 安全检查：防止容器不存在导致报错
-            if (!container) {
-                console.error('Toast container not found!');
-                alert(message); // 降级处理
-                return;
-            }
-
             const toast = document.createElement('div');
     
-            // 🎨 修改点1：添加了 warning (琥珀色) 的支持
-            const bgColor = type === 'success' ? 'bg-emerald-500' : 
-                            type === 'error' ? 'bg-red-500' : 
-                            type === 'warning' ? 'bg-amber-500' : // 新增警告色
-                            'bg-blue-500'; // 默认蓝色
-                   
-            // 🎨 修改点2：添加了 warning (警示三角形) 图标
-            const icon = type === 'success' ? 'check-circle' : 
-                         type === 'error' ? 'x-circle' : 
-                         type === 'warning' ? 'alert-triangle' : // 新增警告图标
-                         'info';
+            const bgColor = type === 'success' ? 'bg-emerald-500' :
+                          type === 'error' ? 'bg-red-500' :
+                          type === 'warning' ? 'bg-amber-500' :
+                          'bg-gray-800';
     
-            toast.className = `${bgColor} text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-2 toast-enter pointer-events-auto mb-2`;
-            toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5"></i><span>${message}</span>`;
+            toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-lg text-white ${bgColor}`;
+            toast.textContent = message;
+            toast.style.transform = 'translateY(-100%)';
+            toast.style.opacity = '0';
+            toast.style.transition = 'all 0.3s ease';
     
-            container.appendChild(toast);
+            document.body.appendChild(toast);
     
-            // 重新渲染图标
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-    
+            // 动画进入
             setTimeout(() => {
-                toast.classList.remove('toast-enter');
-                toast.classList.add('toast-exit');
+                toast.style.transform = 'translateY(0)';
+                toast.style.opacity = '1';
+            }, 10);
+    
+            // 3秒后移除
+            setTimeout(() => {
+                toast.style.transform = 'translateY(-100%)';
+                toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 300);
-            }, 2500);
+            }, 3000);
        }
+
         // 移动端菜单 (#2)
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
@@ -2602,6 +2562,5 @@
             }
         }
     </script>
-    <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 </body>
 </html>
