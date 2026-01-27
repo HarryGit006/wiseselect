@@ -1520,22 +1520,33 @@
             initScrollEffects();
         });
 
-        // V18: 从 Supabase 数据库加载商品
-        async function loadProductsFromDB() {
+        // V18: 从 Supabase 数据库加载商品 (最优修改版)
+        async function loadProductsFromDB(category = 'all') {
             try {
-                const { data, error } = await supabaseClient
+                // 1. 构建基础查询：核心是只查 status = 'active'
+                let query = supabaseClient
                     .from('products')
                     .select('*')
-                    .eq('status', 'active')
+                    .eq('status', 'active') 
                     .order('created_at', { ascending: false });
-                
+                    // 2. 动态添加分类筛选
+                // 如果传入了分类且不是 'all'，则只查该分类
+                if (category && category !== 'all') {
+                    query = query.eq('category', category);
+                }
+        
+                // 3. 执行查询
+                const { data, error } = await query;
+        
                 if (error) {
                     console.error('加载商品失败:', error);
+                    if (typeof showToast === 'function') showToast('加载商品失败', 'error');
                     return;
                 }
-                
-                if (data && data.length > 0) {
-                    // 将数据库商品转换为页面格式
+        
+                // 4. 处理数据
+                if (data) {
+                    // 保留你原本完美的数据转换逻辑
                     dbProducts = data.map(item => ({
                         id: item.id,
                         order_code: item.order_code,
@@ -1556,12 +1567,22 @@
                         created_at: item.created_at,
                         expires_at: item.expires_at
                     }));
-                    console.log('从数据库加载了', dbProducts.length, '个商品');
+
+                    console.log(`已加载 ${category} 分类下的 ${dbProducts.length} 个商品`);
+
+                    // 5. 关键步骤：调用渲染函数更新页面
+                    // 请确认你的渲染函数名是 renderProducts 还是 renderGoods
+                    if (typeof renderProducts === 'function') {
+                        renderProducts(dbProducts); 
+                    } else if (typeof renderGoods === 'function') {
+                        renderGoods(); // 如果你的代码里用的是这个名字
+                    }
                 }
             } catch (err) {
                 console.error('数据库连接错误:', err);
+                if (typeof showToast === 'function') showToast('网络连接错误', 'error');
             }
-        }
+        }   
 
         // V18: 获取所有商品（数据库 + 示例数据）
         function getAllProducts() {
@@ -1582,25 +1603,46 @@
             });
         }
 
-        // Toast提示 (#15)
+        // Toast提示 (#15) - 增强版 (支持 warning 状态)
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
+            // 🛡️ 安全检查：防止容器不存在导致报错
+            if (!container) {
+                console.error('Toast container not found!');
+                alert(message); // 降级处理
+                return;
+            }
+
             const toast = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
-            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info';
-            
+    
+            // 🎨 修改点1：添加了 warning (琥珀色) 的支持
+            const bgColor = type === 'success' ? 'bg-emerald-500' : 
+                            type === 'error' ? 'bg-red-500' : 
+                            type === 'warning' ? 'bg-amber-500' : // 新增警告色
+                            'bg-blue-500'; // 默认蓝色
+                   
+            // 🎨 修改点2：添加了 warning (警示三角形) 图标
+            const icon = type === 'success' ? 'check-circle' : 
+                         type === 'error' ? 'x-circle' : 
+                         type === 'warning' ? 'alert-triangle' : // 新增警告图标
+                         'info';
+    
             toast.className = `${bgColor} text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-2 toast-enter pointer-events-auto mb-2`;
             toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5"></i><span>${message}</span>`;
+    
             container.appendChild(toast);
-            lucide.createIcons();
-            
+    
+            // 重新渲染图标
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+    
             setTimeout(() => {
                 toast.classList.remove('toast-enter');
                 toast.classList.add('toast-exit');
                 setTimeout(() => toast.remove(), 300);
             }, 2500);
-        }
-
+       }
         // 移动端菜单 (#2)
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
@@ -2488,14 +2530,47 @@
 
         function markAsSold() { document.getElementById('soldConfirmModal').classList.remove('hidden'); lucide.createIcons(); }
         function closeSoldConfirmModal() { document.getElementById('soldConfirmModal').classList.add('hidden'); }
-        function confirmMarkSold() {
-            const orderIndex = orders.findIndex(o => o.code === currentOrderCode);
-            if (orderIndex !== -1) {
-                orders[orderIndex].status = 'sold';
-                localStorage.setItem('zhixuan_orders', JSON.stringify(orders));
+        async function confirmMarkSold() {
+            const orderCode = currentOrderCode;
+    
+            // 显示加载状态
+            const confirmBtn = document.querySelector('#soldConfirmModal button[onclick="confirmMarkSold()"]');
+            const originalText = confirmBtn ? confirmBtn.textContent : '';
+    
+            if (confirmBtn) {
+                 confirmBtn.textContent = '处理中...';
+                 confirmBtn.disabled = true;
+            }
+    
+            try {
+                // ✅ 直接更新 Supabase 数据库
+                const { data, error } = await supabase
+                    .from('products')
+                    .update({ 
+                        status: 'sold',
+                        sold_at: new Date().toISOString()
+                    })
+                    .eq('order_code', orderCode)
+                    .select()
+                    .single();
+        
+                if (error) throw error;
+        
                 closeSoldConfirmModal();
-                displayOrderResult(orders[orderIndex]);
-                showToast('恭喜！商品已标记为成交');
+                showToast('恭喜！商品已标记为成交', 'success');
+        
+                // ✅ 重新从数据库加载最新状态
+                await queryOrderByCode(orderCode);
+        
+            } catch (error) {
+                console.error('标记成交失败:', error);
+        
+                if (confirmBtn) {
+                    confirmBtn.textContent = originalText;
+                    confirmBtn.disabled = false;
+                }
+        
+                showToast('操作失败：' + error.message, 'error');
             }
         }
 
@@ -2527,5 +2602,6 @@
             }
         }
     </script>
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 </body>
 </html>
