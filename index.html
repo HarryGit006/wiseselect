@@ -1520,7 +1520,7 @@
     
             // 从数据库加载商品
             try {
-                await loadProductsFromDB();
+                await loadProducts();
                 console.log('✅ 数据库加载完成, dbProducts:', dbProducts.length);
             } catch (err) {
                 console.error('❌ 数据库加载失败:', err);
@@ -2423,7 +2423,7 @@
                 lucide.createIcons();
                 
                 // 11. 刷新商品列表（显示新发布的商品）
-                await loadProductsFromDB();
+                await loadProducts();
                 renderProducts();
                 
                 // 12. 显示成功提示
@@ -2603,7 +2603,7 @@
         
                 // 刷新显示
                 await queryOrderByCode(orderCode);
-                await loadProductsFromDB();
+                await loadProducts();
                 renderProducts();
         
             } catch (error) {
