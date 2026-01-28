@@ -1549,7 +1549,7 @@
 
         async function loadProducts(category = 'all') {
             try {
-                let query = supabase
+                let query = supabaseClient
                     .from('products')
                     .select('*')
                     .eq('status', 'active')  // 🔑 添加这一行！只显示展示中的商品
