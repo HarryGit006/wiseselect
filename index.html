@@ -1515,22 +1515,31 @@
         document.addEventListener('DOMContentLoaded', async function() {
             lucide.createIcons();
     
-            // ✅ 显示骨架屏
+            // 确保骨架屏隐藏（它默认就是hidden，保持隐藏）
             const skeleton = document.getElementById('productSkeleton');
-            if (skeleton) skeleton.classList.remove('hidden');
     
-            // ✅ 从数据库加载商品
-            await loadProductsFromDB();
+            // 从数据库加载商品
+            try {
+                await loadProductsFromDB();
+                console.log('✅ 数据库加载完成, dbProducts:', dbProducts.length);
+            } catch (err) {
+                console.error('❌ 数据库加载失败:', err);
+            }
     
-            // ✅ 隐藏骨架屏
-            if (skeleton) skeleton.classList.add('hidden');
+            // 确保骨架屏隐藏（双重保险）
+            if (skeleton) {
+                skeleton.classList.add('hidden');
+                skeleton.style.display = 'none';
+            }
     
-            // ✅ 渲染商品
+            // 渲染商品
             renderProducts();
     
-            initScrollEffects();
+            // 初始化滚动效果
+            if (typeof initScrollEffects === 'function') {
+                initScrollEffects();
+           }
         });
-
         
 
         // ========================================
