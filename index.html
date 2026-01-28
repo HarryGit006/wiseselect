@@ -1565,7 +1565,10 @@
                 if (error) throw error;
         
                 // ✅ 关键修复：设置 dbProducts 数组
-                dbProducts = products || [];
+                dbProducts = (products || []).map(item => ({
+                    ...item,
+                    image: item.images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/400x300?text=No+Image'
+                }));
                 console.log('✅ 加载了', dbProducts.length, '个数据库商品');
 
                 // 渲染商品列表
