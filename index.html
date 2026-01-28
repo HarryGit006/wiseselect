@@ -1564,8 +1564,12 @@
         
                 if (error) throw error;
         
+                // ✅ 关键修复：设置 dbProducts 数组
+                dbProducts = products || [];
+                console.log('✅ 加载了', dbProducts.length, '个数据库商品');
+
                 // 渲染商品列表
-                renderProducts(products || []);
+                renderProducts();
         
             } catch (error) {
                 console.error('加载商品失败:', error);
