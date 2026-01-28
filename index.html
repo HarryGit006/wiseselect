@@ -1212,7 +1212,7 @@
             </div>
             
             <p class="text-sm text-gray-600 mb-4">
-                或添加微信：<strong class="text-blue-600">715284059</strong>
+                或添加微信：<strong class="text-blue-600">712345678</strong>
             </p>
             
             <button onclick="closeContactModal()" class="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-200 transition-all">
@@ -1514,9 +1514,20 @@
         // 初始化
         document.addEventListener('DOMContentLoaded', async function() {
             lucide.createIcons();
-            // V18: 从 Supabase 加载商品
+    
+            // ✅ 显示骨架屏
+            const skeleton = document.getElementById('productSkeleton');
+            if (skeleton) skeleton.classList.remove('hidden');
+    
+            // ✅ 从数据库加载商品
             await loadProductsFromDB();
+    
+            // ✅ 隐藏骨架屏
+            if (skeleton) skeleton.classList.add('hidden');
+    
+            // ✅ 渲染商品
             renderProducts();
+    
             initScrollEffects();
         });
 
@@ -2454,21 +2465,77 @@
             document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
             document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
         }
-
-        function queryOrder() {
-            const code = document.getElementById('orderCodeInput').value.trim().toUpperCase();
-            if (!code) { showToast('请输入订单码', 'error'); return; }
-            const order = orders.find(o => o.code === code);
-            if (order) {
-                currentOrderCode = code;
-                displayOrderResult(order);
-                document.getElementById('orderResult').classList.remove('hidden');
-                document.getElementById('orderNotFound').classList.add('hidden');
-            } else {
+        // ============================================
+        // 【新增】通过订单码查询订单（先查数据库，再查本地）
+        // ============================================
+        async function queryOrderByCode(orderCode) {
+            try {
+            // 1. 先从数据库查询
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .select('*')
+                    .eq('order_code', orderCode)
+                    .single();
+        
+                if (data) {
+                    const order = {
+                        code: data.order_code,
+                        name: data.name,
+                        price: data.price,
+                        category: data.category,
+                        description: data.description,
+                        phone: data.phone,
+                        wechat: data.wechat,
+                        images: data.images || [],
+                        status: data.status,
+                        createdAt: data.created_at,
+                        expiresAt: data.expires_at
+                    };
+                    displayOrderResult(order);
+                    document.getElementById('orderResult').classList.remove('hidden');
+                    document.getElementById('orderNotFound').classList.add('hidden');
+                    lucide.createIcons();
+                    return order;
+                }
+        
+                // 2. 数据库没有，从 localStorage 查询
+                const localOrder = orders.find(o => o.code === orderCode);
+                if (localOrder) {
+                    displayOrderResult(localOrder);
+                    document.getElementById('orderResult').classList.remove('hidden');
+                    document.getElementById('orderNotFound').classList.add('hidden');
+                    lucide.createIcons();
+                    return localOrder;
+                }
+        
+                // 3. 都没找到
                 document.getElementById('orderResult').classList.add('hidden');
                 document.getElementById('orderNotFound').classList.remove('hidden');
+                lucide.createIcons();
+                return null;
+        
+            } catch (err) {
+                console.error('查询订单失败:', err);
+                return null;
             }
-            lucide.createIcons();
+        }
+
+        async function queryOrder() {
+            const code = document.getElementById('orderCodeInput').value.trim().toUpperCase();
+            if (!code) { 
+                showToast('请输入订单码', 'error'); 
+                return; 
+            }
+    
+            currentOrderCode = code;
+            showToast('正在查询...', 'info');
+    
+            // ✅ 使用新的查询函数（会同时查数据库和本地）
+            const order = await queryOrderByCode(code);
+    
+            if (order) {
+                showToast('查询成功', 'success');
+           }
         }
 
         function displayOrderResult(order) {
@@ -2493,18 +2560,17 @@
         async function confirmMarkSold() {
             const orderCode = currentOrderCode;
     
-            // 显示加载状态
             const confirmBtn = document.querySelector('#soldConfirmModal button[onclick="confirmMarkSold()"]');
             const originalText = confirmBtn ? confirmBtn.textContent : '';
     
             if (confirmBtn) {
-                 confirmBtn.textContent = '处理中...';
-                 confirmBtn.disabled = true;
+                confirmBtn.textContent = '处理中...';
+                confirmBtn.disabled = true;
             }
     
             try {
-                // ✅ 直接更新 Supabase 数据库
-                const { data, error } = await supabase
+                // ✅ 核心修复：使用 supabaseClient 而不是 supabase
+                const { data, error } = await supabaseClient
                     .from('products')
                     .update({ 
                         status: 'sold',
@@ -2516,11 +2582,20 @@
         
                 if (error) throw error;
         
+                // 同时更新 localStorage
+                const orderIndex = orders.findIndex(o => o.code === orderCode);
+                if (orderIndex !== -1) {
+                    orders[orderIndex].status = 'sold';
+                    localStorage.setItem('zhixuan_orders', JSON.stringify(orders));
+                }
+        
                 closeSoldConfirmModal();
                 showToast('恭喜！商品已标记为成交', 'success');
         
-                // ✅ 重新从数据库加载最新状态
+                // 刷新显示
                 await queryOrderByCode(orderCode);
+                await loadProductsFromDB();
+                renderProducts();
         
             } catch (error) {
                 console.error('标记成交失败:', error);
@@ -2530,9 +2605,9 @@
                     confirmBtn.disabled = false;
                 }
         
-                showToast('操作失败：' + error.message, 'error');
+                showToast('操作失败：' + (error.message || '请稍后重试'), 'error');
             }
-        }
+       }
 
         function showExtendModal() {
             const order = orders.find(o => o.code === currentOrderCode);
